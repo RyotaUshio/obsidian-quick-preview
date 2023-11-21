@@ -29,7 +29,7 @@ interface BlockLinkInfo extends LinkInfo {
 	type: "block";
 	idMatch: SearchMatches | null;
 	subpath: string;
-	node: any;
+	node?: any;
 	display: string;
 	content: string;
 }
@@ -62,12 +62,13 @@ export default class MyPlugin extends Plugin {
 	patch() {
 		// @ts-ignore
 		const prototype = this.app.workspace.editorSuggest.suggests[0].constructor.prototype as BuiltInAutocompletion;
+		const plugin = this;
 
 		const uninstaller = around(prototype, {
 			renderSuggestion(old) {
 				return function (item: Item, el: HTMLElement) {
 					if (item.type === "block") {
-						if (this.settings.math && item.node.type === "math") {
+						if (plugin.settings.math && item.node?.type === "math") {
 							el.appendChild(renderMath(item.node.value, true))
 							return;
 						}

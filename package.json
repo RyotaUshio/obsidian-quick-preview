@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-better-link-autocompletion",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Enhance Obsidian's built-in link autocompletion.",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
