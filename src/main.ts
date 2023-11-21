@@ -3,6 +3,9 @@ import { DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab } from './settings
 import { around } from 'monkey-around';
 
 
+
+
+
 interface LinkInfo {
 	file: TFile;
 	matches: SearchMatches | null;
@@ -64,7 +67,6 @@ export default class MyPlugin extends Plugin {
 			renderSuggestion(old) {
 				return function (item: Item, el: HTMLElement) {
 					if (item.type === "block") {
-						console.log(item);
 						if (this.settings.math && item.node.type === "math") {
 							el.appendChild(renderMath(item.node.value, true))
 							return;
