@@ -3,11 +3,15 @@ import MyPlugin from './main';
 
 
 export interface MyPluginSettings {
-	mySetting: string;
+	math: boolean;
+	// code: boolean;
+	// callout: boolean;
 }
 
 export const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	math: true,
+	// code: true,
+	// callout: true,
 }
 
 export class SampleSettingTab extends PluginSettingTab {
@@ -15,19 +19,22 @@ export class SampleSettingTab extends PluginSettingTab {
 		super(plugin.app, plugin);
 	}
 
+	addSetting(name: string, settingName: keyof MyPluginSettings) {
+		new Setting(this.containerEl)
+		.setName(name)
+		.addToggle((toggle) => {
+			toggle.setValue(this.plugin.settings.math)
+			toggle.onChange(async (value) => {
+				this.plugin.settings[settingName] = value;
+				await this.plugin.saveSettings();
+			});
+		});
+	}
+
 	display(): void {
-		const {containerEl} = this;
+		const { containerEl } = this;
 		containerEl.empty();
 
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
+		this.addSetting('Math', 'math');
 	}
 }
