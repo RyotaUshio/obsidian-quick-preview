@@ -1,7 +1,7 @@
 {
 	"id": "better-link-autocompletion",
 	"name": "Better Link Autocompletion",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"minAppVersion": "1.3.5",
 	"description": "Enhance Obsidian's built-in link autocompletion.",
 	"author": "Ryota Ushio",
