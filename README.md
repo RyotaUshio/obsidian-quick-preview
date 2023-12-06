@@ -6,8 +6,8 @@ This is an [Obsidian.md](https://obsidian.md) plugin that enhances the built-in 
 2. Render markdown in block link suggestions (i.e. `[[note title^` or `[[^`)
 
 > [!note]
-> The first feature requires the [page preview](https://help.obsidian.md/Plugins/Page+preview) core plugin enabled. Unfortunately, it's currently not compatible with [Hover Editor](https://github.com/nothingislost/obsidian-hover-editor).
-> The second functionality works whether Hover Editor is enabled or not.
+> - The first feature requires the [page preview](https://help.obsidian.md/Plugins/Page+preview) core plugin enabled. Unfortunately, it's currently incompatible with [Hover Editor](https://github.com/nothingislost/obsidian-hover-editor).
+> - The second functionality works whether Hover Editor is enabled or not.
 
 ## Installation
 
