@@ -5,6 +5,9 @@ This is an [Obsidian.md](https://obsidian.md) plugin that enhances the built-in 
 1. Hold down `Alt`/`Option` (by default) to quickly preview the link target without clicking
 2. Render markdown in block link suggestions (i.e. `[[note title^` or `[[^`)
 
+> [!note]
+> The first feature requires the [page preview](https://help.obsidian.md/Plugins/Page+preview) core plugin enabled. Unfortunately, it's currently not compatible with [Hover Editor](https://github.com/nothingislost/obsidian-hover-editor).
+
 ## Installation
 
 Since this plugin is still in beta, it's not on the community plugin browser yet.
