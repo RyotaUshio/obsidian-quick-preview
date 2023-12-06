@@ -6,7 +6,8 @@ This is an [Obsidian.md](https://obsidian.md) plugin that enhances the built-in 
 2. Render markdown in block link suggestions (i.e. `[[note title^` or `[[^`)
 
 > [!note]
-> The first feature requires the [page preview](https://help.obsidian.md/Plugins/Page+preview) core plugin enabled.
+> - The first feature requires the [page preview](https://help.obsidian.md/Plugins/Page+preview) core plugin enabled.
+> - You can adjust the font size for quick preview via [Style Settings](https://github.com/mgmeyers/obsidian-style-settings).
 
 ## Installation
 
