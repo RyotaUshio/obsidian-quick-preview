@@ -31,6 +31,7 @@ export interface MyPluginSettings {
 	modifierToPreview: Modifier;
 	compactPreview: boolean;
 	dev: boolean;
+	disableClose: boolean;
 }
 
 export const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -57,6 +58,7 @@ export const DEFAULT_SETTINGS: MyPluginSettings = {
 	modifierToPreview: 'Alt',
 	compactPreview: false,
 	dev: false,
+	disableClose: false,
 }
 
 export class SampleSettingTab extends PluginSettingTab {
@@ -64,13 +66,14 @@ export class SampleSettingTab extends PluginSettingTab {
 		super(plugin.app, plugin);
 	}
 
-	addToggleSetting(settingName: KeysOfType<MyPluginSettings, boolean>) {
+	addToggleSetting(settingName: KeysOfType<MyPluginSettings, boolean>, extraOnChange?: (value: boolean) => void) {
 		return new Setting(this.containerEl)
 			.addToggle((toggle) => {
 				toggle.setValue(this.plugin.settings[settingName])
 					.onChange(async (value) => {
 						this.plugin.settings[settingName] = value;
 						await this.plugin.saveSettings();
+						extraOnChange?.(value);
 					});
 			});
 	}
@@ -159,10 +162,14 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setName('Comment line limit')
 			.setDesc('Maximum number of lines to render. Set to 0 to disable line limit.');
 
-		new Setting(this.containerEl).setName('Advanced').setHeading();
+		new Setting(this.containerEl).setName('Debug mode (advanced)').setHeading();
 
 		this.addToggleSetting('dev')
-			.setName('Dev mode')
+			.setName('Log suggestion items to console')
 			.setDesc('Show metadata about suggestion items in the dev console.');
+		this.addToggleSetting('disableClose', (disable) => {
+			disable ? this.plugin.disableClose() : this.plugin.enableClose();
+		}).setName('Prevent the suggestion box from closing')
+			.setDesc('Useful for inspecting the suggestion box.');
 	}
 }

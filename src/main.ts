@@ -6,12 +6,14 @@ import { BlockLinkInfo, FileLinkInfo, HeadingLinkInfo } from 'typings/items';
 import { extractFirstNLines, render } from 'utils';
 import { KeyEventAwareHoverParent } from 'hoverParent';
 
+
 type Item = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
 export type BuiltInAutocompletion = EditorSuggest<Item> & { component: Component };
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 	#originalOnLinkHover: (hoverParent: HoverParent, targetEl: HTMLElement | null, linktext: string, sourcePath: string, state?: any) => any;
+	#uninstallDisableClose: (() => void) | null = null;
 
 	async onload() {
 		await this.loadSettings();
@@ -31,9 +33,8 @@ export default class MyPlugin extends Plugin {
 			this.#originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
 		}
 
-		this.app.workspace.onLayoutReady(() => {
-			this.patch();
-		})
+		this.app.workspace.onLayoutReady(() => this.patch());
+		if (this.settings.disableClose) this.disableClose();
 	}
 
 	async loadSettings() {
@@ -101,7 +102,7 @@ export default class MyPlugin extends Plugin {
 
 						if (plugin.settings[item.node.type] === false) return;
 
-						let text = item.content.slice(item.node.position.start.offset, item.node.position.end.offset);						
+						let text = item.content.slice(item.node.position.start.offset, item.node.position.end.offset);
 						let limit: number | undefined = (plugin.settings as any)[item.node.type + 'Lines'];
 						if (limit) text = extractFirstNLines(text, limit);
 
@@ -111,7 +112,7 @@ export default class MyPlugin extends Plugin {
 							});
 							return;
 						}
-					
+
 						render(el, async (containerEl) => {
 							containerEl.setAttribute('data-line', item.node.position.start.line.toString());
 							await MarkdownRenderer.render(
@@ -123,5 +124,29 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 		}));
+	}
+
+	disableClose() {
+		if (this.#uninstallDisableClose) return;
+
+		// @ts-ignore
+		const suggest = this.app.workspace.editorSuggest.suggests[0] as BuiltInAutocompletion;
+
+		this.register(this.#uninstallDisableClose = around(suggest.constructor.prototype, {
+			close(old) {
+				return function () { }
+			}
+		}));
+	}
+
+	enableClose() {
+		if (!this.#uninstallDisableClose) return;
+
+		this.#uninstallDisableClose();
+		this.#uninstallDisableClose = null;
+
+		// @ts-ignore
+		const suggest = this.app.workspace.editorSuggest.suggests[0] as BuiltInAutocompletion;
+		if (suggest.isOpen) suggest.close();		
 	}
 }
