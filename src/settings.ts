@@ -168,7 +168,8 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setName('Log suggestion items to console')
 			.setDesc('Show metadata about suggestion items in the dev console.');
 		this.addToggleSetting('disableClose', (disable) => {
-			disable ? this.plugin.disableClose() : this.plugin.enableClose();
+			const suggest = this.plugin.getSuggest();
+			if (!disable && suggest.isOpen) suggest.close();
 		}).setName('Prevent the suggestion box from closing')
 			.setDesc('Useful for inspecting the suggestion box.');
 	}
