@@ -1,7 +1,7 @@
 {
 	"id": "enhanced-link-suggestions",
 	"name": "Enhanced Link Suggestions",
-	"version": "0.2.7",
+	"version": "0.2.8",
 	"minAppVersion": "1.3.5",
 	"description": "Upgrade Obsidian's built-in link suggestions with quick preview & block markdown rendering.",
 	"author": "Ryota Ushio",
