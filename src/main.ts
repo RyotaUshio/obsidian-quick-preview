@@ -47,6 +47,8 @@ export default class MyPlugin extends Plugin {
 					self.component.load();
 					self.component.registerDomEvent(window, 'keydown', (event) => {
 						if (suggest.isOpen && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
+							if (app.plugins.enabledPlugins.has('obsidian-hover-editor')) return;
+							
 							const item = suggest.suggestions.values[suggest.suggestions.selectedItem];
 							const parent = new KeyEventAwareHoverParent(plugin, suggest);
 							self.component.addChild(parent);

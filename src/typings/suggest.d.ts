@@ -1,6 +1,12 @@
 import { Scope } from "obsidian";
 
 declare module "obsidian" {
+    interface App {
+        plugins: {
+            enabledPlugins: Set<string>;
+        }
+    }
+
     interface EditorSuggest<T> {
         scope: Scope;
         suggestions: {
