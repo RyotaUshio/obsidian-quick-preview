@@ -9,3 +9,20 @@
 .suggestion-content {
     width: 100%;
 }
+
+.suggestion-title>.markdown-rendered>* {
+    margin-block-start: calc(var(--p-spacing) * 0.3);
+    margin-block-end: calc(var(--p-spacing) * 0.3);
+    margin-left: calc(var(--p-spacing) * 0.1);
+    margin-right: calc(var(--p-spacing) * 0.1);
+
+    &>p {
+        margin-block-start: calc(var(--p-spacing) * 0.3);
+        margin-block-end: calc(var(--p-spacing) * 0.3);
+    }
+}
+
+.suggestion-title>.markdown-rendered mjx-container[display="true"] {
+    margin-top: calc(var(--p-spacing) * 0.3);
+    margin-bottom: calc(var(--p-spacing) * 0.3);
+}

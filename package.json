@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-better-link-autocompletion",
-	"version": "0.1.2",
-	"description": "Enhance Obsidian's built-in link autocompletion.",
+	"name": "obsidian-enhanced-link-suggestions",
+	"version": "0.2.0",
+	"description": "Upgrade Obsidian's built-in link suggestions with quick preview & block markdown rendering.",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",

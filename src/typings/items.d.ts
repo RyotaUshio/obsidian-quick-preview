@@ -23,12 +23,13 @@ interface BlockLinkInfo extends LinkInfo {
     type: "block";
     idMatch: SearchMatches | null;
     subpath: string;
-    node: CalloutNode | MathNode;
+    node: Node; // CalloutNode | MathNode;
     display: string;
     content: string;
 }
 
 interface Node {
+    type: 'code' | 'blockquote' | 'heading' | 'paragraph' | 'callout' | 'math' | 'listItem' | 'footnoteDefinition' | 'element' | 'table';
     children: Node[];
     position: {
         start: Loc;

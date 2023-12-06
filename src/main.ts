@@ -1,10 +1,11 @@
-import { MarkdownRenderer, finishRenderMath } from 'obsidian';
-import { Component, EditorSuggest, HoverParent, HoverPopover, Keymap, MarkdownView, Plugin, SearchMatches, TFile, renderMath, stripHeadingForLink } from 'obsidian';
-import { DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab } from './settings';
+import { Component, MarkdownRenderer, EditorSuggest, HoverParent, HoverPopover, Keymap, Plugin, stripHeadingForLink } from 'obsidian';
 import { around } from 'monkey-around';
-import { BlockLinkInfo, CalloutLinkInfo, FileLinkInfo, HeadingLinkInfo, MathLinkInfo, MathNode } from 'typings/items';
 
-type Item = FileLinkInfo | HeadingLinkInfo | MathLinkInfo | CalloutLinkInfo | BlockLinkInfo;
+import { DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab } from 'settings';
+import { BlockLinkInfo, FileLinkInfo, HeadingLinkInfo } from 'typings/items';
+import { extractFirstNLines, render } from 'utils';
+
+type Item = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
 type BuiltInAutocompletion = EditorSuggest<Item> & { component: Component };
 
 export default class MyPlugin extends Plugin {
@@ -42,12 +43,13 @@ export default class MyPlugin extends Plugin {
 			open(old) {
 				return function () {
 					old.call(this);
-					this.component.load();
-					(this.component as Component).registerDomEvent(window, 'keydown', (event) => {
+					const self = this as BuiltInAutocompletion;
+					self.component.load();
+					self.component.registerDomEvent(window, 'keydown', (event) => {
 						if (suggest.isOpen && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
 							const item = suggest.suggestions.values[suggest.suggestions.selectedItem];
-							const parent = new KeyupHandlingHoverParent(plugin, suggest);
-							this.component.addChild(parent);
+							const parent = new KeyEventAwareHoverParent(plugin, suggest);
+							self.component.addChild(parent);
 							if (item.type === 'file') {
 								app.workspace.trigger('link-hover', parent, null, item.file.path, "")
 							} else if (item.type === 'heading') {
@@ -72,26 +74,19 @@ export default class MyPlugin extends Plugin {
 					if (plugin.settings.dev) console.log(item);
 
 					if (item.type === "block") {
-						if (plugin.settings.math && item.node?.type === "math") {
-							renderInSuggestionTitleEl(el, (titleEl) => {
-								titleEl.replaceChildren(renderMath((item.node as MathNode).value, true));
-							});
-							finishRenderMath();
-							return;
-						}
+						if (plugin.settings[item.node.type] === false) return;
 
-						if (plugin.settings.callout && item.node?.type === "callout") {
-							renderInSuggestionTitleEl(el, async (titleEl) => {
-								await MarkdownRenderer.render(
-									app,
-									extractCalloutTitle(item.content.slice(item.node.position.start.offset, item.node.position.end.offset)),
-									titleEl,
-									item.file.path,
-									plugin
-								);
-							});
-							return;
-						}
+						let text = item.content.slice(item.node.position.start.offset, item.node.position.end.offset);
+						let limit: number | undefined = (plugin.settings as any)[item.node.type + 'Lines'];
+						if (limit) text = extractFirstNLines(text, limit);
+					
+						render(el, async (containerEl) => {
+							containerEl.setAttribute('data-line', item.node.position.start.line.toString());
+							await MarkdownRenderer.render(
+								app, text, containerEl, item.file.path, this.component
+							);
+							containerEl.querySelectorAll('.copy-code-button').forEach((el) => el.remove());
+						});
 					}
 				}
 			}
@@ -99,7 +94,7 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-export class KeyupHandlingHoverParent extends Component implements HoverParent {
+export class KeyEventAwareHoverParent extends Component implements HoverParent {
 	#hoverPopover: HoverPopover | null;
 
 	constructor(private plugin: MyPlugin, private suggest: BuiltInAutocompletion) {
@@ -110,6 +105,11 @@ export class KeyupHandlingHoverParent extends Component implements HoverParent {
 	onunload() {
 		super.onunload();
 		this.hideChild();
+	}
+
+	hideChild() {
+		/// @ts-ignore
+		this.#hoverPopover?.hide();
 	}
 
 	get hoverPopover() {
@@ -139,23 +139,4 @@ export class KeyupHandlingHoverParent extends Component implements HoverParent {
 			})
 		}
 	}
-
-	hideChild() {
-		/// @ts-ignore
-		this.#hoverPopover?.hide();
-	}
-}
-
-
-function extractCalloutTitle(text: string) {
-	const lineBreak = text.indexOf('\n');
-	return lineBreak === -1 ? text : text.slice(0, lineBreak + 1);
-}
-
-function renderInSuggestionTitleEl(el: HTMLElement, cb: (suggestionTitleEl: HTMLElement) => void) {
-	const suggestionTitleEl = el.querySelector<HTMLElement>('.suggestion-title');
-	if (suggestionTitleEl) {
-		suggestionTitleEl.replaceChildren();
-		cb(suggestionTitleEl)
-	};
 }
