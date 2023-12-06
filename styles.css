@@ -1,3 +1,19 @@
+/* @settings
+
+name: Enhanced Link Suggestions
+id: enhanced-link-suggestions
+settings:
+    -
+        id: quick-preview-font-size
+        title: Font size for quick preview
+        type: variable-number-slider
+        min: 10
+        max: 200
+        step: 1
+        default: 100
+        format: "%"
+*/
+
 .suggestion-item[data-item-type="block"][data-item-node-type="comment"] {
     color: var(--code-comment);
 }
@@ -6,8 +22,8 @@
     color: #ea5555;
 }
 
-.compact-font.hover-popover .markdown-rendered {
-    font-size: 100%;
+.enhanced-link-suggestions.hover-popover .markdown-rendered {
+    font-size: var(--quick-preview-font-size);
 }
 
 .suggestion-container {

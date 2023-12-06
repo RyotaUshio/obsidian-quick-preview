@@ -27,8 +27,7 @@ export class KeyEventAwareHoverParent extends Component implements HoverParent {
 		this.#hoverPopover = hoverPopover;
 		if (this.#hoverPopover) {
 			this.addChild(this.#hoverPopover);
-			this.#hoverPopover.hoverEl.addClass('math-booster');
-			this.#hoverPopover.hoverEl.toggleClass('compact-font', this.plugin.settings.compactPreview);
+			this.#hoverPopover.hoverEl.addClass('enhanced-link-suggestions');
 			this.#hoverPopover.registerDomEvent(document.body, 'keydown', (event: KeyboardEvent) => {
 				if (event.key === 'ArrowUp') {
 					event.preventDefault();

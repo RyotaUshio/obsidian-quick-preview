@@ -29,7 +29,6 @@ export interface MyPluginSettings {
 	tableLines: number;
 	commentLines: number;
 	modifierToPreview: Modifier;
-	compactPreview: boolean;
 	dev: boolean;
 	disableClose: boolean;
 }
@@ -56,7 +55,6 @@ export const DEFAULT_SETTINGS: MyPluginSettings = {
 	tableLines: 0,
 	commentLines: 0,
 	modifierToPreview: 'Alt',
-	compactPreview: false,
 	dev: false,
 	disableClose: false,
 }
@@ -118,9 +116,6 @@ export class SampleSettingTab extends PluginSettingTab {
 		this.addDropdowenSetting('modifierToPreview', ['Mod', 'Ctrl', 'Meta', 'Shift', 'Alt'], getModifierNameInPlatform)
 			.setName('Modifier key for quick preview')
 			.setDesc('Hold down this key to preview the link without clicking.');
-		this.addToggleSetting('compactPreview')
-			.setName('Compact preview')
-			.setDesc('Use compact font size for the preview.');
 
 		new Setting(this.containerEl).setName('Block markdown rendering').setHeading();
 		this.addToggleSetting('paragraph').setName('Render paragraphs');
