@@ -50,7 +50,7 @@ export const DEFAULT_SETTINGS: MyPluginSettings = {
 	footnoteDefinitionLines: 0,
 	elementLines: 0,
 	tableLines: 0,
-	modifierToPreview: 'Alt',
+	modifierToPreview: 'Mod',
 	compactPreview: false,
 	dev: false,
 }

@@ -2,7 +2,7 @@
 
 This is an [Obsidian.md](https://obsidian.md) plugin that enhances the built-in link suggestion by adding the following functionalities:
 
-1. Hold down `Alt`/`Option` (by default) to quickly preview the link target without clicking
+1. Hold down `Ctrl`/`Cmd` (by default) to quickly preview the link target without clicking
 2. Render markdown in block link suggestions (i.e. `[[note title^` or `[[^`)
 
 > [!note]
