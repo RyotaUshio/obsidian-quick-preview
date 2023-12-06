@@ -54,7 +54,7 @@ export const DEFAULT_SETTINGS: MyPluginSettings = {
 	elementLines: 0,
 	tableLines: 0,
 	commentLines: 0,
-	modifierToPreview: 'Alt',
+	modifierToPreview: 'Shift',
 	dev: false,
 	disableClose: false,
 }
