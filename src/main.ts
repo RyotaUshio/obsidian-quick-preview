@@ -10,11 +10,25 @@ type BuiltInAutocompletion = EditorSuggest<Item> & { component: Component };
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+	originalOnLinkHover: (hoverParent: HoverParent, targetEl: HTMLElement | null, linktext: string, sourcePath: string, state?: any) => any;
 
 	async onload() {
 		await this.loadSettings();
 		await this.saveSettings();
 		this.addSettingTab(new SampleSettingTab(this));
+
+		/**
+		 * Hover Editor completely replaces the core Page Preview plugin's onLinkHover method with its own.
+		 * But Hover Editor's version is incompatible with this plugin, so we need to store the original method
+		 * and call it instead.
+		 */
+		if (this.app.plugins.enabledPlugins.has('obsidian-hover-editor')) {
+			await this.app.plugins.disablePlugin('obsidian-hover-editor');
+			this.originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
+			await this.app.plugins.enablePlugin('obsidian-hover-editor');
+		} else {
+			this.originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
+		}
 
 		this.app.workspace.onLayoutReady(() => {
 			this.patch();
@@ -27,6 +41,12 @@ export default class MyPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	/** Call the core Page Preview plugin's (potentially) original onLinkHover method. */
+	onLinkHover(...args: any[]) {
+		const self = this.app.internalPlugins.getPluginById('page-preview').instance;
+		return this.originalOnLinkHover.call(self, ...args);
 	}
 
 	patch() {
@@ -47,17 +67,15 @@ export default class MyPlugin extends Plugin {
 					self.component.load();
 					self.component.registerDomEvent(window, 'keydown', (event) => {
 						if (suggest.isOpen && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
-							if (app.plugins.enabledPlugins.has('obsidian-hover-editor')) return;
-							
 							const item = suggest.suggestions.values[suggest.suggestions.selectedItem];
 							const parent = new KeyEventAwareHoverParent(plugin, suggest);
 							self.component.addChild(parent);
 							if (item.type === 'file') {
-								app.workspace.trigger('link-hover', parent, null, item.file.path, "")
+								plugin.onLinkHover(parent, null, item.file.path, "")
 							} else if (item.type === 'heading') {
-								app.workspace.trigger('link-hover', parent, null, item.file.path + '#' + stripHeadingForLink(item.heading), "")
+								plugin.onLinkHover(parent, null, item.file.path + '#' + stripHeadingForLink(item.heading), "")
 							} else if (item.type === 'block') {
-								app.workspace.trigger('link-hover', parent, null, item.file.path, "", { scroll: item.node.position.start.line })
+								plugin.onLinkHover(parent, null, item.file.path, "", { scroll: item.node.position.start.line })
 							}
 						}
 					});

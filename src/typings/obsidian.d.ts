@@ -4,6 +4,11 @@ declare module "obsidian" {
     interface App {
         plugins: {
             enabledPlugins: Set<string>;
+            enablePlugin(id: string): Promise<void>;
+            disablePlugin(id: string): Promise<void>;
+        }
+        internalPlugins: {
+            getPluginById(id: string): Plugin & { instance: any };
         }
     }
 
@@ -14,7 +19,7 @@ declare module "obsidian" {
             values: T[];
             containerEl: HTMLElement;
             moveUp(event: KeyboardEvent): void;
-            moveDown(event: KeyboardEvent): void;    
+            moveDown(event: KeyboardEvent): void;
         };
         suggestEl: HTMLElement;
         isOpen: boolean;

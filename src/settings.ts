@@ -108,12 +108,6 @@ export class SampleSettingTab extends PluginSettingTab {
 	display(): void {
 		this.containerEl.empty();
 
-		if (this.app.plugins.enabledPlugins.has('obsidian-hover-editor')) {
-			new Setting(this.containerEl)
-				.setDesc('Quick preview is not available because Hover Editor is enabled.')
-				.then((setting) => setting.settingEl.addClass('alert-hover-editor'));
-		}
-
 		this.addDropdowenSetting('modifierToPreview', ['Mod', 'Ctrl', 'Meta', 'Shift', 'Alt'], getModifierNameInPlatform)
 			.setName('Modifier key for quick preview')
 			.setDesc('Hold down this key to preview the link without clicking.');
