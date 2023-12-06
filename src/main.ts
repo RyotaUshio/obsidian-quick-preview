@@ -44,9 +44,9 @@ export default class MyPlugin extends Plugin {
 	}
 
 	/** Call the core Page Preview plugin's (potentially) original onLinkHover method. */
-	onLinkHover(...args: any[]) {
+	onLinkHover(hoverParent: HoverParent, targetEl: HTMLElement | null, linktext: string, sourcePath: string, state?: any) {
 		const self = this.app.internalPlugins.getPluginById('page-preview').instance;
-		return this.#originalOnLinkHover.call(self, ...args);
+		return this.#originalOnLinkHover.call(self, hoverParent, targetEl, linktext, sourcePath, state);
 	}
 
 	getSuggest(): BuiltInAutocompletion {
