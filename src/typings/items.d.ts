@@ -1,4 +1,4 @@
-import { Loc, Pos, SearchMatches, TFile } from "obsidian";
+import { Loc, SearchMatches, TFile } from "obsidian";
 
 export interface LinkInfo {
     file: TFile;
@@ -29,7 +29,7 @@ interface BlockLinkInfo extends LinkInfo {
 }
 
 interface Node {
-    type: 'code' | 'blockquote' | 'heading' | 'paragraph' | 'callout' | 'math' | 'listItem' | 'footnoteDefinition' | 'element' | 'table';
+    type: 'code' | 'blockquote' | 'heading' | 'paragraph' | 'callout' | 'math' | 'listItem' | 'footnoteDefinition' | 'element' | 'table' | 'comment';
     children: Node[];
     position: {
         start: Loc;

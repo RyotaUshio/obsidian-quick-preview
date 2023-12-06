@@ -18,6 +18,7 @@ export interface MyPluginSettings {
 	footnoteDefinition: boolean;
 	element: boolean;
 	table: boolean;
+	comment: boolean;
 	codeLines: number;
 	blockquoteLines: number;
 	paragraphLines: number;
@@ -26,6 +27,7 @@ export interface MyPluginSettings {
 	footnoteDefinitionLines: number;
 	elementLines: number;
 	tableLines: number;
+	commentLines: number;
 	modifierToPreview: Modifier;
 	compactPreview: boolean;
 	dev: boolean;
@@ -42,6 +44,7 @@ export const DEFAULT_SETTINGS: MyPluginSettings = {
 	footnoteDefinition: true,
 	element: true,
 	table: true,
+	comment: true,
 	codeLines: 0,
 	blockquoteLines: 0,
 	paragraphLines: 0,
@@ -50,6 +53,7 @@ export const DEFAULT_SETTINGS: MyPluginSettings = {
 	footnoteDefinitionLines: 0,
 	elementLines: 0,
 	tableLines: 0,
+	commentLines: 0,
 	modifierToPreview: 'Alt',
 	compactPreview: false,
 	dev: false,
@@ -149,6 +153,10 @@ export class SampleSettingTab extends PluginSettingTab {
 		this.addToggleSetting('element').setName('Render elements');
 		this.addSliderSetting('elementLines', 0, 10, 1)
 			.setName('Element line limit')
+			.setDesc('Maximum number of lines to render. Set to 0 to disable line limit.');
+		this.addToggleSetting('comment').setName('Render comments');
+		this.addSliderSetting('commentLines', 0, 10, 1)
+			.setName('Comment line limit')
 			.setDesc('Maximum number of lines to render. Set to 0 to disable line limit.');
 
 		new Setting(this.containerEl).setName('Advanced').setHeading();

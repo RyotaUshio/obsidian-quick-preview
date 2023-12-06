@@ -1,3 +1,7 @@
+.suggestion-item[data-item-type="block"][data-item-node-type="comment"] {
+    color: var(--code-comment);
+}
+
 .alert-hover-editor .setting-item-description {
     color: #ea5555;
 }

@@ -1,16 +1,17 @@
-import { Component, MarkdownRenderer, EditorSuggest, HoverParent, HoverPopover, Keymap, Plugin, stripHeadingForLink } from 'obsidian';
+import { Component, MarkdownRenderer, EditorSuggest, HoverParent, Keymap, Plugin, stripHeadingForLink } from 'obsidian';
 import { around } from 'monkey-around';
 
 import { DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab } from 'settings';
 import { BlockLinkInfo, FileLinkInfo, HeadingLinkInfo } from 'typings/items';
 import { extractFirstNLines, render } from 'utils';
+import { KeyEventAwareHoverParent } from 'hoverParent';
 
 type Item = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
-type BuiltInAutocompletion = EditorSuggest<Item> & { component: Component };
+export type BuiltInAutocompletion = EditorSuggest<Item> & { component: Component };
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
-	originalOnLinkHover: (hoverParent: HoverParent, targetEl: HTMLElement | null, linktext: string, sourcePath: string, state?: any) => any;
+	#originalOnLinkHover: (hoverParent: HoverParent, targetEl: HTMLElement | null, linktext: string, sourcePath: string, state?: any) => any;
 
 	async onload() {
 		await this.loadSettings();
@@ -24,10 +25,10 @@ export default class MyPlugin extends Plugin {
 		 */
 		if (this.app.plugins.enabledPlugins.has('obsidian-hover-editor')) {
 			await this.app.plugins.disablePlugin('obsidian-hover-editor');
-			this.originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
+			this.#originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
 			await this.app.plugins.enablePlugin('obsidian-hover-editor');
 		} else {
-			this.originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
+			this.#originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
 		}
 
 		this.app.workspace.onLayoutReady(() => {
@@ -46,7 +47,7 @@ export default class MyPlugin extends Plugin {
 	/** Call the core Page Preview plugin's (potentially) original onLinkHover method. */
 	onLinkHover(...args: any[]) {
 		const self = this.app.internalPlugins.getPluginById('page-preview').instance;
-		return this.originalOnLinkHover.call(self, ...args);
+		return this.#originalOnLinkHover.call(self, ...args);
 	}
 
 	patch() {
@@ -93,12 +94,23 @@ export default class MyPlugin extends Plugin {
 
 					if (plugin.settings.dev) console.log(item);
 
+					el.setAttribute('data-item-type', item.type);
+
 					if (item.type === "block") {
+						el.setAttribute('data-item-node-type', item.node.type);
+
 						if (plugin.settings[item.node.type] === false) return;
 
-						let text = item.content.slice(item.node.position.start.offset, item.node.position.end.offset);
+						let text = item.content.slice(item.node.position.start.offset, item.node.position.end.offset);						
 						let limit: number | undefined = (plugin.settings as any)[item.node.type + 'Lines'];
 						if (limit) text = extractFirstNLines(text, limit);
+
+						if (item.node.type === "comment") {
+							render(el, (containerEl) => {
+								containerEl.setText(text);
+							});
+							return;
+						}
 					
 						render(el, async (containerEl) => {
 							containerEl.setAttribute('data-line', item.node.position.start.line.toString());
@@ -111,52 +123,5 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 		}));
-	}
-}
-
-export class KeyEventAwareHoverParent extends Component implements HoverParent {
-	#hoverPopover: HoverPopover | null;
-
-	constructor(private plugin: MyPlugin, private suggest: BuiltInAutocompletion) {
-		super();
-		this.#hoverPopover = null;
-	}
-
-	onunload() {
-		super.onunload();
-		this.hideChild();
-	}
-
-	hideChild() {
-		/// @ts-ignore
-		this.#hoverPopover?.hide();
-	}
-
-	get hoverPopover() {
-		return this.#hoverPopover;
-	}
-
-	set hoverPopover(hoverPopover: HoverPopover | null) {
-		this.#hoverPopover = hoverPopover;
-		if (this.#hoverPopover) {
-			this.addChild(this.#hoverPopover);
-			this.#hoverPopover.hoverEl.addClass('math-booster');
-			this.#hoverPopover.hoverEl.toggleClass('compact-font', this.plugin.settings.compactPreview);
-			this.#hoverPopover.registerDomEvent(document.body, 'keydown', (event: KeyboardEvent) => {
-				if (event.key === 'ArrowUp') {
-					event.preventDefault();
-					this.hideChild();
-					this.suggest.suggestions.moveUp(event);
-				} else if (event.key === 'ArrowDown') {
-					event.preventDefault();
-					this.hideChild();
-					this.suggest.suggestions.moveDown(event);
-				}
-
-			})
-			this.#hoverPopover.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
-				if (event.key === this.plugin.settings.modifierToPreview) this.hideChild();
-			})
-		}
 	}
 }
