@@ -1,9 +1,8 @@
 # Obsidian Quick Preview
 
-This is an [Obsidian.md](https://obsidian.md) plugin that enhances the built-in link suggestion and quick switcher by adding the following functionalities:
+This [Obsidian.md](https://obsidian.md) plugin enhances the built-in link suggestion and quick switcher by adding a quick preview functionality to them.
 
-1. Hold down `Alt`/`Option` (by default) to quickly preview the link target without clicking
-2. Render markdown in block link suggestions (i.e. `[[note title^` or `[[^`)
+Hold down `Alt`/`Option` (by default) to quickly preview a suggestion before actually selecting it.
 
 > [!note]
 > - This plugin requires the [Page Preview](https://help.obsidian.md/Plugins/Page+preview) core plugin enabled.
