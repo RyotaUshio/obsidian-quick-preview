@@ -14,14 +14,6 @@ settings:
         format: "%"
 */
 
-.suggestion-item[data-item-type="block"][data-item-node-type="comment"] {
-    color: var(--code-comment);
-}
-
-.alert-hover-editor .setting-item-description {
-    color: #ea5555;
-}
-
 .enhanced-link-suggestions.hover-popover .markdown-rendered {
     font-size: var(--quick-preview-font-size);
 }
@@ -29,25 +21,4 @@ settings:
 /* Make sure that the quick preview is on top of the quick switcher modal and the link suggestions */
 .popover.hover-popover.enhanced-link-suggestions {
     z-index: calc(max(var(--layer-modal), var(--layer-notice)) + 1);
-}
-
-.suggestion-content {
-    width: 100%;
-}
-
-.suggestion-title>.markdown-rendered>* {
-    margin-block-start: calc(var(--p-spacing) * 0.3);
-    margin-block-end: calc(var(--p-spacing) * 0.3);
-    margin-left: calc(var(--p-spacing) * 0.1);
-    margin-right: calc(var(--p-spacing) * 0.1);
-
-    &>p {
-        margin-block-start: calc(var(--p-spacing) * 0.3);
-        margin-block-end: calc(var(--p-spacing) * 0.3);
-    }
-}
-
-.suggestion-title>.markdown-rendered mjx-container[display="true"] {
-    margin-top: calc(var(--p-spacing) * 0.3);
-    margin-bottom: calc(var(--p-spacing) * 0.3);
 }
