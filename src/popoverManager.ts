@@ -1,12 +1,12 @@
-import { KeyboardEventAwareHoverParent } from "hoverParent";
+import { QuickPreviewHoverParent } from "hoverParent";
 import EnhancedLinkSuggestionsPlugin, { BuiltInAutocompletion, Item } from "main";
 import { Component, Keymap, KeymapEventHandler, stripHeadingForLink } from "obsidian";
 import { getSelectedItem } from "utils";
 
 
 export class PopoverManager extends Component {
-    currentHoverParent: KeyboardEventAwareHoverParent | null = null;
-    currentOpenHoverParent: KeyboardEventAwareHoverParent | null = null;
+    currentHoverParent: QuickPreviewHoverParent | null = null;
+    currentOpenHoverParent: QuickPreviewHoverParent | null = null;
     handlers: KeymapEventHandler[] = [];
 
     constructor(private plugin: EnhancedLinkSuggestionsPlugin, private suggest: BuiltInAutocompletion) {
@@ -48,7 +48,7 @@ export class PopoverManager extends Component {
     spawnPreview(item: Item, lazyHide: boolean = false) {
         this.hide(lazyHide);
 
-        this.currentHoverParent = new KeyboardEventAwareHoverParent(this.suggest);
+        this.currentHoverParent = new QuickPreviewHoverParent(this.suggest);
         if (item.type === 'file') {
             this.plugin.onLinkHover(this.currentHoverParent, null, item.file.path, "");
         } else if (item.type === 'heading') {
