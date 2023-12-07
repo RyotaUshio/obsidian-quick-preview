@@ -2,9 +2,12 @@
 	"name": "obsidian-enhanced-link-suggestions",
 	"version": "0.3.0",
 	"description": "Upgrade Obsidian's built-in link suggestions with quick preview & block markdown rendering.",
+	"main": "lib/index.js",
+    "types": "lib/index.d.ts",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"lib": "tsc --project tsconfig-lib.json",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
 	"keywords": [],
