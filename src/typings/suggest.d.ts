@@ -3,7 +3,7 @@ import { PopoverManager } from "popoverManager";
 
 
 export type SuggestItem = FileInfo | HeadingInfo | BlockInfo;
-export type BuiltInSuggestItem = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
+export type BuiltInSuggestItem = FileLinkInfo | AliasLinkInfo | HeadingLinkInfo | BlockLinkInfo;
 export type BuiltInSuggest = EditorSuggest<BuiltInSuggestItem> & { manager: PopoverManager<BuiltInSuggestItem> };
 export type Suggester<T> = PopoverSuggest<T> | SuggestModal<T>;
 export type PatchedSuggester<T> = Suggester<T> & { manager: PopoverManager<T> };
@@ -40,6 +40,10 @@ export interface LinkInfo {
 
 export interface FileLinkInfo extends LinkInfo {
     type: "file";
+}
+
+export interface AliasLinkInfo extends LinkInfo {
+    type: "alias";
 }
 
 export interface HeadingLinkInfo extends LinkInfo {

@@ -27,13 +27,17 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 		this.app.workspace.onLayoutReady(() => {
 			this.patchSetSelectedItem();
 			const itemNormalizer = (item: BuiltInSuggestItem | QuickSwitcherItem): SuggestItem => {
-				if (item.type !== "block") return item as SuggestItem;
-				return {
-					type: "block",
-					file: item.file,
-					line: item.node.position.start.line,
-				};
-			}
+				if (item.type === "alias") {
+					return { type: "file", file: item.file };
+				} else if (item.type === "block") {
+					return {
+						type: "block",
+						file: item.file,
+						line: item.node.position.start.line,
+					};
+				}
+				return item;
+			};
 			// @ts-ignore
 			this.patchSuggester(this.getBuiltInSuggest().constructor, itemNormalizer);
 			this.patchSuggester(this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal, itemNormalizer);
