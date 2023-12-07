@@ -1,12 +1,13 @@
 import { KeyboardEventAwareHoverParent } from "hoverParent";
 import EnhancedLinkSuggestionsPlugin, { BuiltInAutocompletion, Item } from "main";
-import { Component, Keymap, stripHeadingForLink } from "obsidian";
+import { Component, Keymap, KeymapEventHandler, stripHeadingForLink } from "obsidian";
 import { getSelectedItem } from "utils";
 
 
 export class PopoverManager extends Component {
     currentHoverParent: KeyboardEventAwareHoverParent | null = null;
     currentOpenHoverParent: KeyboardEventAwareHoverParent | null = null;
+    handlers: KeymapEventHandler[] = [];
 
     constructor(private plugin: EnhancedLinkSuggestionsPlugin, private suggest: BuiltInAutocompletion) {
         super();
@@ -19,17 +20,24 @@ export class PopoverManager extends Component {
                 this.spawnPreview(item);
             }
         });
-        this.suggest.scope.register([this.plugin.settings.modifierToPreview], 'ArrowUp', (event) => {
-            this.suggest.suggestions.moveUp(event);
-            return false;
-        });
-        this.suggest.scope.register([this.plugin.settings.modifierToPreview], 'ArrowDown', (event) => {
-            this.suggest.suggestions.moveDown(event);
-            return false;
-        });
-        this.suggest.manager.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
+        this.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
             if (event.key === this.plugin.settings.modifierToPreview) this.hide();
-        })
+        });
+
+        this.handlers.push(
+            this.suggest.scope.register([this.plugin.settings.modifierToPreview], 'ArrowUp', (event) => {
+                this.suggest.suggestions.moveUp(event);
+                return false;
+            }),
+            this.suggest.scope.register([this.plugin.settings.modifierToPreview], 'ArrowDown', (event) => {
+                this.suggest.suggestions.moveDown(event);
+                return false;
+            })
+        );
+    }
+
+    onunload() {
+        this.handlers.forEach((handler) => this.suggest.scope.unregister(handler));
     }
 
     hide(lazy: boolean = false) {
