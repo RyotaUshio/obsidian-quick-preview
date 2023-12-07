@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-enhanced-link-suggestions",
-	"version": "0.3.3",
-	"description": "Upgrade Obsidian's built-in link suggestions with quick preview & block markdown rendering.",
+	"name": "obsidian-quick-preview",
+	"version": "0.4.0",
+	"description": "An Obsidian.md plugin to quickly preview a suggestion before selecting it in link suggestions & quick swicher.",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
 	"files": [
