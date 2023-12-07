@@ -115,11 +115,12 @@ export class EnhancedLinkSuggestionsSettingTab extends PluginSettingTab {
 	display(): void {
 		this.containerEl.empty();
 
+		new Setting(this.containerEl).setName('Quick preview').setHeading();
 		this.addDropdowenSetting('modifierToPreview', ['Mod', 'Ctrl', 'Meta', 'Shift', 'Alt'], getModifierNameInPlatform)
 			.setName('Modifier key for quick preview')
 			.setDesc('Hold down this key to preview the link without clicking.');
 		this.addToggleSetting('lazyHide')
-			.setName("Don't close the preview until the new preview is ready")
+			.setName("Don't close the current preview until the next preview is ready")
 			.setDesc('If turned on, pressing arrow keys or hovering the mouse over the suggestions while holding the modifier key will not immediately close the preview, but instead wait for the preview for the newly selected suggestion to load.');
 
 		new Setting(this.containerEl).setName('Block markdown rendering').setHeading();
