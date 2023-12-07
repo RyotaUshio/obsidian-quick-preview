@@ -1,4 +1,4 @@
-import { Modifier, Platform } from "obsidian";
+import { EditorSuggest, Modifier, Platform } from "obsidian";
 
 
 export function extractFirstNLines(text: string, n: number) {
@@ -29,4 +29,8 @@ export function getModifierNameInPlatform(mod: Modifier): string {
         return Platform.isMacOS || Platform.isIosApp ? "command" : Platform.isWin ? "Win" : "Meta";
     }
     return "ctrl";
+}
+
+export function getSelectedItem<T>(suggest: EditorSuggest<T>): T {
+    return suggest.suggestions.values[suggest.suggestions.selectedItem];
 }

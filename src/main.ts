@@ -1,23 +1,23 @@
-import { Component, MarkdownRenderer, EditorSuggest, HoverParent, Keymap, Plugin, stripHeadingForLink } from 'obsidian';
+import { Component, MarkdownRenderer, EditorSuggest, HoverParent, Keymap, Plugin } from 'obsidian';
 import { around } from 'monkey-around';
 
-import { DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab } from 'settings';
+import { DEFAULT_SETTINGS, EnhancedLinkSuggestionsSettings, EnhancedLinkSuggestionsSettingTab } from 'settings';
 import { BlockLinkInfo, FileLinkInfo, HeadingLinkInfo } from 'typings/items';
-import { extractFirstNLines, render } from 'utils';
-import { KeyEventAwareHoverParent } from 'hoverParent';
+import { extractFirstNLines, getSelectedItem, render } from 'utils';
+import { PopoverManager } from 'popoverManager';
 
 
-type Item = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
-export type BuiltInAutocompletion = EditorSuggest<Item> & { component: Component };
+export type Item = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
+export type BuiltInAutocompletion = EditorSuggest<Item> & { manager: PopoverManager };
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class EnhancedLinkSuggestionsPlugin extends Plugin {
+	settings: EnhancedLinkSuggestionsSettings;
 	#originalOnLinkHover: (hoverParent: HoverParent, targetEl: HTMLElement | null, linktext: string, sourcePath: string, state?: any) => any;
 
 	async onload() {
 		await this.loadSettings();
 		await this.saveSettings();
-		this.addSettingTab(new SampleSettingTab(this));
+		this.addSettingTab(new EnhancedLinkSuggestionsSettingTab(this));
 
 		/**
 		 * Hover Editor completely replaces the core Page Preview plugin's onLinkHover method with its own.
@@ -60,36 +60,20 @@ export default class MyPlugin extends Plugin {
 		const plugin = this;
 		const app = this.app;
 
-		this.addChild(suggest.component = new Component());
-		suggest.isOpen ? suggest.component.load() : suggest.component.unload();
-
 		this.register(around(prototype, {
 			open(old) {
 				return function () {
 					old.call(this);
 					const self = this as BuiltInAutocompletion;
-					self.component.load();
-					self.component.registerDomEvent(window, 'keydown', (event) => {
-						if (suggest.isOpen && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
-							const item = suggest.suggestions.values[suggest.suggestions.selectedItem];
-							const parent = new KeyEventAwareHoverParent(plugin, suggest);
-							self.component.addChild(parent);
-							if (item.type === 'file') {
-								plugin.onLinkHover(parent, null, item.file.path, "")
-							} else if (item.type === 'heading') {
-								plugin.onLinkHover(parent, null, item.file.path + '#' + stripHeadingForLink(item.heading), "")
-							} else if (item.type === 'block') {
-								plugin.onLinkHover(parent, null, item.file.path, "", { scroll: item.node.position.start.line })
-							}
-						}
-					});
+					if (!self.manager) self.manager = new PopoverManager(plugin, self);
+					self.manager.load();
 				}
 			},
 			close(old) {
 				return function () {
 					if (plugin.settings.disableClose) return;
 					old.call(this);
-					this.component.unload();
+					this.manager.unload();
 				}
 			},
 			renderSuggestion(old) {
@@ -119,7 +103,7 @@ export default class MyPlugin extends Plugin {
 						render(el, async (containerEl) => {
 							containerEl.setAttribute('data-line', item.node.position.start.line.toString());
 							await MarkdownRenderer.render(
-								app, text, containerEl, item.file.path, this.component
+								app, text, containerEl, item.file.path, this.manager
 							);
 							containerEl.querySelectorAll('.copy-code-button').forEach((el) => el.remove());
 						});
@@ -127,5 +111,21 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 		}));
+
+
+		this.register(around(suggest.suggestions.constructor.prototype, {
+			setSelectedItem(old) {
+				return function (index: number, event: KeyboardEvent | null) {
+					old.call(this, index, event);
+
+					if (this.chooser !== plugin.getSuggest()) return;
+
+					if (event && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
+						const item = getSelectedItem(this.chooser as BuiltInAutocompletion);
+						(this.chooser as BuiltInAutocompletion).manager.spawnPreview(item);
+					}
+				}
+			}
+		}))
 	}
 }

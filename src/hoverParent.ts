@@ -1,48 +1,29 @@
-import MyPlugin, { BuiltInAutocompletion } from "main";
-import { Component, HoverParent, HoverPopover } from "obsidian";
+import { BuiltInAutocompletion } from "main";
+import { HoverParent, HoverPopover } from "obsidian";
 
-export class KeyEventAwareHoverParent extends Component implements HoverParent {
-	#hoverPopover: HoverPopover | null;
+export class KeyboardEventAwareHoverParent implements HoverParent {
+    #hoverPopover: HoverPopover | null = null;
+    hidden: boolean;
 
-	constructor(private plugin: MyPlugin, private suggest: BuiltInAutocompletion) {
-		super();
-		this.#hoverPopover = null;
-	}
+    constructor(private suggest: BuiltInAutocompletion) {
+        this.hidden = false;
+    }
 
-	onunload() {
-		super.onunload();
-		this.hideChild();
-	}
+    hide() {
+        this.hoverPopover?.hide();
+        this.hidden = true;
+    }
 
-	hideChild() {
-		/// @ts-ignore
-		this.#hoverPopover?.hide();
-	}
+    get hoverPopover() {
+        return this.#hoverPopover;
+    }
 
-	get hoverPopover() {
-		return this.#hoverPopover;
-	}
-
-	set hoverPopover(hoverPopover: HoverPopover | null) {
-		this.#hoverPopover = hoverPopover;
-		if (this.#hoverPopover) {
-			this.addChild(this.#hoverPopover);
-			this.#hoverPopover.hoverEl.addClass('enhanced-link-suggestions');
-			this.#hoverPopover.registerDomEvent(document.body, 'keydown', (event: KeyboardEvent) => {
-				if (event.key === 'ArrowUp') {
-					event.preventDefault();
-					this.hideChild();
-					this.suggest.suggestions.moveUp(event);
-				} else if (event.key === 'ArrowDown') {
-					event.preventDefault();
-					this.hideChild();
-					this.suggest.suggestions.moveDown(event);
-				}
-
-			})
-			this.#hoverPopover.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
-				if (event.key === this.plugin.settings.modifierToPreview) this.hideChild();
-			})
-		}
-	}
+    set hoverPopover(hoverPopover: HoverPopover | null) {
+        this.#hoverPopover = hoverPopover;
+        if (this.#hoverPopover) {
+            this.suggest.manager.addChild(this.#hoverPopover);
+            if (this.hidden) this.hide();
+            else this.#hoverPopover.hoverEl.addClass('enhanced-link-suggestions');
+        }
+    }
 }

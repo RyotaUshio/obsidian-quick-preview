@@ -1,5 +1,5 @@
 import { Modifier, PluginSettingTab, Setting } from 'obsidian';
-import MyPlugin from './main';
+import EnhancedLinkSuggestionsPlugin from './main';
 import { getModifierNameInPlatform } from 'utils';
 
 
@@ -7,7 +7,7 @@ import { getModifierNameInPlatform } from 'utils';
 export type KeysOfType<Obj, Type> = { [k in keyof Obj]: Obj[k] extends Type ? k : never }[keyof Obj];
 
 
-export interface MyPluginSettings {
+export interface EnhancedLinkSuggestionsSettings {
 	code: boolean;
 	blockquote: boolean;
 	heading: boolean;
@@ -33,7 +33,7 @@ export interface MyPluginSettings {
 	disableClose: boolean;
 }
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {
+export const DEFAULT_SETTINGS: EnhancedLinkSuggestionsSettings = {
 	code: true,
 	blockquote: true,
 	heading: true,
@@ -59,12 +59,12 @@ export const DEFAULT_SETTINGS: MyPluginSettings = {
 	disableClose: false,
 }
 
-export class SampleSettingTab extends PluginSettingTab {
-	constructor(public plugin: MyPlugin) {
+export class EnhancedLinkSuggestionsSettingTab extends PluginSettingTab {
+	constructor(public plugin: EnhancedLinkSuggestionsPlugin) {
 		super(plugin.app, plugin);
 	}
 
-	addToggleSetting(settingName: KeysOfType<MyPluginSettings, boolean>, extraOnChange?: (value: boolean) => void) {
+	addToggleSetting(settingName: KeysOfType<EnhancedLinkSuggestionsSettings, boolean>, extraOnChange?: (value: boolean) => void) {
 		return new Setting(this.containerEl)
 			.addToggle((toggle) => {
 				toggle.setValue(this.plugin.settings[settingName])
@@ -76,7 +76,7 @@ export class SampleSettingTab extends PluginSettingTab {
 			});
 	}
 
-	addDropdowenSetting(settingName: KeysOfType<MyPluginSettings, string>, options: string[], display?: (option: string) => string) {
+	addDropdowenSetting(settingName: KeysOfType<EnhancedLinkSuggestionsSettings, string>, options: string[], display?: (option: string) => string) {
 		return new Setting(this.containerEl)
 			.addDropdown((dropdown) => {
 				const displayNames = new Set<string>();
@@ -96,7 +96,7 @@ export class SampleSettingTab extends PluginSettingTab {
 			});
 	}
 
-	addSliderSetting(settingName: KeysOfType<MyPluginSettings, number>, min: number, max: number, step: number) {
+	addSliderSetting(settingName: KeysOfType<EnhancedLinkSuggestionsSettings, number>, min: number, max: number, step: number) {
 		return new Setting(this.containerEl)
 			.addSlider((slider) => {
 				slider.setLimits(min, max, step)

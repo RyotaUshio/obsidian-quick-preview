@@ -12,16 +12,26 @@ declare module "obsidian" {
         }
     }
 
+    interface Component {
+        _loaded: boolean;
+    }
+
     interface EditorSuggest<T> {
         scope: Scope;
         suggestions: {
+            chooser: EditorSuggest<T>;
             selectedItem: number;
             values: T[];
             containerEl: HTMLElement;
             moveUp(event: KeyboardEvent): void;
             moveDown(event: KeyboardEvent): void;
+            setSelectedItem(index: number, event: KeyboardEvent | null): void;
         };
         suggestEl: HTMLElement;
         isOpen: boolean;
+    }
+
+    interface HoverPopover {
+        hide(): void;
     }
 }
