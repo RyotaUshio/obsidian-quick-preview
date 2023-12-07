@@ -1,4 +1,4 @@
-import { Component, Keymap, KeymapEventHandler, PopoverSuggest, SuggestModal, stripHeadingForLink } from "obsidian";
+import { Component, Keymap, KeymapEventHandler, PopoverSuggest, stripHeadingForLink } from "obsidian";
 
 import EnhancedLinkSuggestionsPlugin from "main";
 import { QuickPreviewHoverParent } from "hoverParent";
@@ -27,7 +27,7 @@ export class PopoverManager<T> extends Component {
         this.registerDomEvent(window, 'keydown', (event) => {
             if (this.suggest.isOpen && Keymap.isModifier(event, this.plugin.settings.modifierToPreview)) {
                 const item = getSelectedItem(this.suggestions);
-                this.spawnPreview(this.itemNormalizer(item));
+                if (item) this.spawnPreview(this.itemNormalizer(item));
             }
         });
         this.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {

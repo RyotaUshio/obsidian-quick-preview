@@ -14,10 +14,10 @@ export function isPluginEnabled(app: App): boolean {
 
 /**
  * Register a suggester class (`PopoverSuggest` (e.g. `EditorSuggest` & `AbstractInputSuggest`) or `SuggestModal`) to be patched by Enhanced Link Suggestions
- * so that it can be used with the Quick Preview feature.
+ * so that it can be used with Quick Preview.
  * 
  * @param app 
- * @param component A component that manages the lifecycle of the suggester's quick preview feature. Typically this is your plugin instance. Unload this component to disable the quick preview feature for the suggester.
+ * @param component A component that manages the lifecycle of the suggester's quick preview feature. Typically this is your plugin instance. Unload this component to disable quick preview for the suggester.
  * @param suggestClass A suggester class to be patched. `PopoverSuggest` (e.g. `EditorSuggest` & `AbstractInputSuggest`) or `SuggestModal` are supported.
  * @param itemNormalizer A function that converts an item of the suggester to a `SuggestItem` object.
  */
@@ -25,7 +25,7 @@ export function registerQuickPreview<T>(app: App, component: Component, suggestC
     app.workspace.onLayoutReady(() => {
         const plugin = app.plugins.getPlugin("enhanced-link-suggestions") as EnhancedLinkSuggestionsPlugin | undefined;
         if (!plugin) throw Error("Enhanced Link Suggestions API: Enhanced Link Suggestions is not enabled.");
-        const uninstaller = plugin.patch(suggestClass, itemNormalizer);
+        const uninstaller = plugin.patchSuggester(suggestClass, itemNormalizer);
         component.register(uninstaller);
     })
 }
