@@ -1,6 +1,7 @@
-import { QuickPreviewHoverParent } from "hoverParent";
-import EnhancedLinkSuggestionsPlugin, { BuiltInAutocompletion, Item } from "main";
 import { Component, Keymap, KeymapEventHandler, stripHeadingForLink } from "obsidian";
+
+import EnhancedLinkSuggestionsPlugin, { BuiltInSuggest, Item } from "main";
+import { QuickPreviewHoverParent } from "hoverParent";
 import { getSelectedItem } from "utils";
 
 
@@ -9,7 +10,7 @@ export class PopoverManager extends Component {
     currentOpenHoverParent: QuickPreviewHoverParent | null = null;
     handlers: KeymapEventHandler[] = [];
 
-    constructor(private plugin: EnhancedLinkSuggestionsPlugin, private suggest: BuiltInAutocompletion) {
+    constructor(private plugin: EnhancedLinkSuggestionsPlugin, private suggest: BuiltInSuggest) {
         super();
     }
 

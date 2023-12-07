@@ -1,13 +1,15 @@
-import { BuiltInAutocompletion } from "main";
 import { HoverParent, HoverPopover } from "obsidian";
+
+import { BuiltInSuggest } from "main";
 import { PopoverManager } from "popoverManager";
+
 
 export class QuickPreviewHoverParent implements HoverParent {
     #hoverPopover: HoverPopover | null = null;
     hidden: boolean;
     manager: PopoverManager;
 
-    constructor(private suggest: BuiltInAutocompletion) {
+    constructor(private suggest: BuiltInSuggest) {
         this.hidden = false;
         this.manager = this.suggest.manager;
     }

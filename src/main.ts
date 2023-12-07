@@ -1,14 +1,14 @@
-import { Component, MarkdownRenderer, EditorSuggest, HoverParent, Keymap, Plugin } from 'obsidian';
+import { MarkdownRenderer, EditorSuggest, HoverParent, Keymap, Plugin } from 'obsidian';
 import { around } from 'monkey-around';
 
 import { DEFAULT_SETTINGS, EnhancedLinkSuggestionsSettings, EnhancedLinkSuggestionsSettingTab } from 'settings';
-import { BlockLinkInfo, FileLinkInfo, HeadingLinkInfo } from 'typings/items';
-import { extractFirstNLines, getSelectedItem, render } from 'utils';
 import { PopoverManager } from 'popoverManager';
+import { extractFirstNLines, getSelectedItem, render } from 'utils';
+import { BlockLinkInfo, FileLinkInfo, HeadingLinkInfo } from 'typings/items';
 
 
 export type Item = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
-export type BuiltInAutocompletion = EditorSuggest<Item> & { manager: PopoverManager };
+export type BuiltInSuggest = EditorSuggest<Item> & { manager: PopoverManager };
 
 export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 	settings: EnhancedLinkSuggestionsSettings;
@@ -49,7 +49,7 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 		return this.#originalOnLinkHover.call(self, hoverParent, targetEl, linktext, sourcePath, state);
 	}
 
-	getSuggest(): BuiltInAutocompletion {
+	getSuggest(): BuiltInSuggest {
 		// @ts-ignore
 		return this.app.workspace.editorSuggest.suggests[0];
 	}
@@ -64,7 +64,7 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 			open(old) {
 				return function () {
 					old.call(this);
-					const self = this as BuiltInAutocompletion;
+					const self = this as BuiltInSuggest;
 					if (!self.manager) self.manager = new PopoverManager(plugin, self);
 					self.manager.load();
 				}
@@ -121,8 +121,8 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 					if (this.chooser !== plugin.getSuggest()) return;
 
 					if (event && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
-						const item = getSelectedItem(this.chooser as BuiltInAutocompletion);
-						(this.chooser as BuiltInAutocompletion).manager.spawnPreview(item, plugin.settings.lazyHide);
+						const item = getSelectedItem(this.chooser as BuiltInSuggest);
+						(this.chooser as BuiltInSuggest).manager.spawnPreview(item, plugin.settings.lazyHide);
 					}
 				}
 			}
