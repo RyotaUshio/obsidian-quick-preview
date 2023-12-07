@@ -1,4 +1,5 @@
 export { type Suggester, type SuggestItem } from "main";
+export { type FileInfo, type HeadingInfo, type BlockInfo } from 'typings/items';
 
 import EnhancedLinkSuggestionsPlugin, { SuggestItem, Suggester } from "main";
 import { App, Component } from "obsidian";

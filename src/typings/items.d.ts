@@ -5,6 +5,18 @@ export interface FileInfo {
     file: TFile;
 }
 
+export interface HeadingInfo {
+    type: "heading";
+    file: TFile;
+    heading: string;
+}
+
+export interface BlockInfo {
+    type: "block";
+    file: TFile;
+    line: number;
+}
+
 export interface QuickSwitcherItem extends FileInfo {
     match: any;
     downranked?: boolean;

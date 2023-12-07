@@ -4,11 +4,11 @@ import { around } from 'monkey-around';
 import { DEFAULT_SETTINGS, EnhancedLinkSuggestionsSettings, EnhancedLinkSuggestionsSettingTab } from 'settings';
 import { PopoverManager } from 'popoverManager';
 import { extractFirstNLines, getSelectedItem, render } from 'utils';
-import { BlockLinkInfo, FileInfo, FileLinkInfo, HeadingLinkInfo } from 'typings/items';
+import { BlockInfo, BlockLinkInfo, FileInfo, FileLinkInfo, HeadingInfo, HeadingLinkInfo, QuickSwitcherItem } from 'typings/items';
 import { OpenableComponent } from 'typings/openable';
 
 
-export type SuggestItem = FileInfo | HeadingLinkInfo | BlockLinkInfo;
+export type SuggestItem = FileInfo | HeadingInfo | BlockInfo;
 export type BuiltInSuggestItem = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
 export type BuiltInSuggest = EditorSuggest<BuiltInSuggestItem> & { manager: PopoverManager<BuiltInSuggestItem> };
 export type Suggester<T> = ISuggestOwner<T> & OpenableComponent & CloseableComponent & { scope: Scope };
@@ -39,9 +39,17 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 		this.app.workspace.onLayoutReady(() => {
 			this.patchRenderSuggestion();
 			this.patchSetSelectedItem();
+			const itemNormalizer = (item: BuiltInSuggestItem | QuickSwitcherItem): SuggestItem => {
+				if (item.type !== "block") return item as SuggestItem;
+				return {
+					type: "block",
+					file: item.file,
+					line: item.node.position.start.line,
+				};
+			}
 			// @ts-ignore
-			this.patch(this.getSuggest().constructor);
-			this.patch(this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal);
+			this.patch(this.getSuggest().constructor, itemNormalizer);
+			this.patch(this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal, itemNormalizer);
 		});
 	}
 
