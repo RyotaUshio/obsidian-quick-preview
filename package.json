@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-enhanced-link-suggestions",
-	"version": "0.3.2",
+	"version": "0.3.3",
 	"description": "Upgrade Obsidian's built-in link suggestions with quick preview & block markdown rendering.",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
