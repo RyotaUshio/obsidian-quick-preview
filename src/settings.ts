@@ -10,14 +10,12 @@ export type KeysOfType<Obj, Type> = { [k in keyof Obj]: Obj[k] extends Type ? k 
 export interface EnhancedLinkSuggestionsSettings {
 	modifierToPreview: Modifier;
 	lazyHide: boolean;
-	dev: boolean;
 	disableClose: boolean;
 }
 
 export const DEFAULT_SETTINGS: EnhancedLinkSuggestionsSettings = {
 	modifierToPreview: 'Alt',
 	lazyHide: true,
-	dev: false,
 	disableClose: false,
 }
 
@@ -84,9 +82,6 @@ export class EnhancedLinkSuggestionsSettingTab extends PluginSettingTab {
 
 		new Setting(this.containerEl).setName('Debug mode (advanced)').setHeading();
 
-		this.addToggleSetting('dev')
-			.setName('Log suggestion items to console')
-			.setDesc('Show metadata about suggestion items in the dev console.');
 		this.addToggleSetting('disableClose', (disable) => {
 			const suggest = this.plugin.getBuiltInSuggest();
 			if (!disable && suggest.isOpen) suggest.close();
