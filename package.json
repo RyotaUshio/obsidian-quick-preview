@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-enhanced-link-suggestions",
-	"version": "0.2.11",
+	"version": "0.2.12",
 	"description": "Upgrade Obsidian's built-in link suggestions with quick preview & block markdown rendering.",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
