@@ -1,9 +1,10 @@
 import { Component, Keymap, KeymapEventHandler, PopoverSuggest, SuggestModal, stripHeadingForLink } from "obsidian";
 
-import EnhancedLinkSuggestionsPlugin, { PatchedSuggester, SuggestItem } from "main";
+import EnhancedLinkSuggestionsPlugin from "main";
 import { QuickPreviewHoverParent } from "hoverParent";
 import { getSelectedItem } from "utils";
 import { Suggestions } from "typings/obsidian";
+import { PatchedSuggester, SuggestItem } from "typings/suggest";
 
 
 export class PopoverManager<T> extends Component {
@@ -17,9 +18,7 @@ export class PopoverManager<T> extends Component {
         super();
 
         if (suggest instanceof PopoverSuggest) this.suggestions = suggest.suggestions;
-        else if (suggest instanceof SuggestModal) this.suggestions = suggest.chooser;
-
-        if (!this.suggestions) throw new Error("No suggestions provided nor can be inferred.");
+        else this.suggestions = suggest.chooser;
 
         this.itemNormalizer = itemNormalizer ?? ((item: T) => item as unknown as SuggestItem);
     }

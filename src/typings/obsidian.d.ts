@@ -1,4 +1,4 @@
-import { Suggester } from "main";
+import { Suggester } from "./suggest";
 
 export interface Suggestions<T> {
     chooser: Suggester<T>;

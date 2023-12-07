@@ -1,7 +1,7 @@
 import { HoverParent, HoverPopover } from "obsidian";
 
-import { PatchedSuggester } from "main";
 import { PopoverManager } from "popoverManager";
+import { PatchedSuggester } from "typings/suggest";
 
 
 export class QuickPreviewHoverParent<T> implements HoverParent {

@@ -1,4 +1,12 @@
-import { Loc, SearchMatches, TFile } from "obsidian";
+import { EditorSuggest, Loc, PopoverSuggest, SearchMatches, SuggestModal, TFile } from "obsidian";
+import { PopoverManager } from "popoverManager";
+
+
+export type SuggestItem = FileInfo | HeadingInfo | BlockInfo;
+export type BuiltInSuggestItem = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
+export type BuiltInSuggest = EditorSuggest<BuiltInSuggestItem> & { manager: PopoverManager<BuiltInSuggestItem> };
+export type Suggester<T> = PopoverSuggest<T> | SuggestModal<T>;
+export type PatchedSuggester<T> = Suggester<T> & { manager: PopoverManager<T> };
 
 export interface FileInfo {
     type: "file";

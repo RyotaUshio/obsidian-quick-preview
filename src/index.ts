@@ -1,8 +1,8 @@
-export { type Suggester, type SuggestItem } from "main";
-export { type FileInfo, type HeadingInfo, type BlockInfo } from 'typings/items';
+export { type SuggestItem, type FileInfo, type HeadingInfo, type BlockInfo } from 'typings/suggest';
 
-import EnhancedLinkSuggestionsPlugin, { SuggestItem, Suggester } from "main";
-import { App, Component } from "obsidian";
+import EnhancedLinkSuggestionsPlugin from "main";
+import { App, Component, PopoverSuggest, SuggestModal } from "obsidian";
+import { SuggestItem } from 'typings/suggest';
 
 /**
  * Check if the Enhanced Link Suggestions plugin is enabled. Even if it returns true, it doesn't mean 
@@ -21,7 +21,7 @@ export function isPluginEnabled(app: App): boolean {
  * @param suggestClass A suggester class to be patched. `PopoverSuggest` (e.g. `EditorSuggest` & `AbstractInputSuggest`) or `SuggestModal` are supported.
  * @param itemNormalizer A function that converts an item of the suggester to a `SuggestItem` object.
  */
-export function registerQuickPreview<T>(app: App, component: Component, suggestClass: new (...args: any[]) => Suggester<T>, itemNormalizer: (item: T) => SuggestItem): void {
+export function registerQuickPreview<T>(app: App, component: Component, suggestClass: new (...args: any[]) => PopoverSuggest<T> | SuggestModal<T>, itemNormalizer: (item: T) => SuggestItem): void {
     app.workspace.onLayoutReady(() => {
         const plugin = app.plugins.getPlugin("enhanced-link-suggestions") as EnhancedLinkSuggestionsPlugin | undefined;
         if (!plugin) throw Error("Enhanced Link Suggestions API: Enhanced Link Suggestions is not enabled.");
