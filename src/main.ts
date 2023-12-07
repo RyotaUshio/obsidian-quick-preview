@@ -17,17 +17,12 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 		this.addSettingTab(new EnhancedLinkSuggestionsSettingTab(this));
 
 		/**
-		 * Hover Editor completely replaces the core Page Preview plugin's onLinkHover method with its own.
+		 * Hover Editor completely replaces the core Page Preview plugin's onLinkHover method with its own
+		 * when the workspace's layout gets ready.
 		 * But Hover Editor's version is incompatible with this plugin, so we need to store the original method
-		 * and call it instead.
+		 * before it's modified by Hover Editor and call it instead.
 		 */
-		if (this.app.plugins.enabledPlugins.has('obsidian-hover-editor')) {
-			await this.app.plugins.disablePlugin('obsidian-hover-editor');
-			this.#originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
-			await this.app.plugins.enablePlugin('obsidian-hover-editor');
-		} else {
-			this.#originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
-		}
+		this.#originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover;
 
 		this.app.workspace.onLayoutReady(() => {
 			this.patchSetSelectedItem();
