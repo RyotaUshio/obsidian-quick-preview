@@ -29,6 +29,7 @@ export interface EnhancedLinkSuggestionsSettings {
 	tableLines: number;
 	commentLines: number;
 	modifierToPreview: Modifier;
+	lazyHide: boolean;
 	dev: boolean;
 	disableClose: boolean;
 }
@@ -55,6 +56,7 @@ export const DEFAULT_SETTINGS: EnhancedLinkSuggestionsSettings = {
 	tableLines: 0,
 	commentLines: 0,
 	modifierToPreview: 'Alt',
+	lazyHide: true,
 	dev: false,
 	disableClose: false,
 }
@@ -116,6 +118,9 @@ export class EnhancedLinkSuggestionsSettingTab extends PluginSettingTab {
 		this.addDropdowenSetting('modifierToPreview', ['Mod', 'Ctrl', 'Meta', 'Shift', 'Alt'], getModifierNameInPlatform)
 			.setName('Modifier key for quick preview')
 			.setDesc('Hold down this key to preview the link without clicking.');
+		this.addToggleSetting('lazyHide')
+			.setName("Don't close the preview until the new preview is ready")
+			.setDesc('If turned on, pressing arrow keys while holding the modifier key will not immediately close the preview, but instead wait for the preview for the newly selected suggestion to load.');
 
 		new Setting(this.containerEl).setName('Block markdown rendering').setHeading();
 		this.addToggleSetting('paragraph').setName('Render paragraphs');

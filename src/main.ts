@@ -122,7 +122,7 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 
 					if (event && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
 						const item = getSelectedItem(this.chooser as BuiltInAutocompletion);
-						(this.chooser as BuiltInAutocompletion).manager.spawnPreview(item);
+						(this.chooser as BuiltInAutocompletion).manager.spawnPreview(item, plugin.settings.lazyHide);
 					}
 				}
 			}

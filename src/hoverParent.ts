@@ -12,6 +12,9 @@ export class KeyboardEventAwareHoverParent implements HoverParent {
     hide() {
         this.hoverPopover?.hide();
         this.hidden = true;
+        if (this.suggest.manager.currentOpenHoverParent === this) {
+            this.suggest.manager.currentOpenHoverParent = null;
+        }
     }
 
     get hoverPopover() {
@@ -22,6 +25,8 @@ export class KeyboardEventAwareHoverParent implements HoverParent {
         this.#hoverPopover = hoverPopover;
         if (this.#hoverPopover) {
             this.suggest.manager.addChild(this.#hoverPopover);
+            this.suggest.manager.currentOpenHoverParent?.hide();
+            this.suggest.manager.currentOpenHoverParent = this;
             if (this.hidden) this.hide();
             else this.#hoverPopover.hoverEl.addClass('enhanced-link-suggestions');
         }

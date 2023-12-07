@@ -6,6 +6,7 @@ import { getSelectedItem } from "utils";
 
 export class PopoverManager extends Component {
     currentHoverParent: KeyboardEventAwareHoverParent | null = null;
+    currentOpenHoverParent: KeyboardEventAwareHoverParent | null = null;
 
     constructor(private plugin: EnhancedLinkSuggestionsPlugin, private suggest: BuiltInAutocompletion) {
         super();
@@ -31,13 +32,13 @@ export class PopoverManager extends Component {
         })
     }
 
-    hide() {
-        this.currentHoverParent?.hide();
+    hide(lazy: boolean = false) {
+        if (!lazy) this.currentHoverParent?.hide();
         this.currentHoverParent = null;
     }
 
-    spawnPreview(item: Item) {
-        this.hide();
+    spawnPreview(item: Item, lazyHide: boolean = false) {
+        this.hide(lazyHide);
 
         this.currentHoverParent = new KeyboardEventAwareHoverParent(this.suggest);
         if (item.type === 'file') {
