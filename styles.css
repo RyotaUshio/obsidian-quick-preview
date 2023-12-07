@@ -26,8 +26,9 @@ settings:
     font-size: var(--quick-preview-font-size);
 }
 
-.suggestion-container {
-    z-index: calc(var(--layer-popover) - 1);
+/* Make sure that the quick preview is on top of the quick switcher modal and the link suggestions */
+.popover.hover-popover.enhanced-link-suggestions {
+    z-index: calc(max(var(--layer-modal), var(--layer-notice)) + 1);
 }
 
 .suggestion-content {

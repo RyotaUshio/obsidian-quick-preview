@@ -1,14 +1,18 @@
-import { MarkdownRenderer, EditorSuggest, HoverParent, Keymap, Plugin } from 'obsidian';
+import { MarkdownRenderer, EditorSuggest, HoverParent, Keymap, Plugin, ISuggestOwner, CloseableComponent, Scope } from 'obsidian';
 import { around } from 'monkey-around';
 
 import { DEFAULT_SETTINGS, EnhancedLinkSuggestionsSettings, EnhancedLinkSuggestionsSettingTab } from 'settings';
 import { PopoverManager } from 'popoverManager';
 import { extractFirstNLines, getSelectedItem, render } from 'utils';
-import { BlockLinkInfo, FileLinkInfo, HeadingLinkInfo } from 'typings/items';
+import { BlockLinkInfo, FileInfo, FileLinkInfo, HeadingLinkInfo } from 'typings/items';
+import { OpenableComponent } from 'typings/openable';
 
 
-export type Item = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
-export type BuiltInSuggest = EditorSuggest<Item> & { manager: PopoverManager };
+export type SuggestItem = FileInfo | HeadingLinkInfo | BlockLinkInfo;
+export type BuiltInSuggestItem = FileLinkInfo | HeadingLinkInfo | BlockLinkInfo;
+export type BuiltInSuggest = EditorSuggest<BuiltInSuggestItem> & { manager: PopoverManager<BuiltInSuggestItem> };
+export type Suggester<T> = ISuggestOwner<T> & OpenableComponent & CloseableComponent & { scope: Scope };
+export type PatchedSuggester<T> = Suggester<T> & { manager: PopoverManager<T> };
 
 export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 	settings: EnhancedLinkSuggestionsSettings;
@@ -32,7 +36,13 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 			this.#originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover
 		}
 
-		this.app.workspace.onLayoutReady(() => this.patch());
+		this.app.workspace.onLayoutReady(() => {
+			this.patchRenderSuggestion();
+			this.patchSetSelectedItem();
+			// @ts-ignore
+			this.patch(this.getSuggest().constructor);
+			this.patch(this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal);
+		});
 	}
 
 	async loadSettings() {
@@ -54,30 +64,14 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 		return this.app.workspace.editorSuggest.suggests[0];
 	}
 
-	patch() {
+	patchRenderSuggestion() {
 		const suggest = this.getSuggest();
-		const prototype = suggest.constructor.prototype;
 		const plugin = this;
 		const app = this.app;
 
-		this.register(around(prototype, {
-			open(old) {
-				return function () {
-					old.call(this);
-					const self = this as BuiltInSuggest;
-					if (!self.manager) self.manager = new PopoverManager(plugin, self);
-					self.manager.load();
-				}
-			},
-			close(old) {
-				return function () {
-					if (plugin.settings.disableClose) return;
-					old.call(this);
-					this.manager.unload();
-				}
-			},
+		this.register(around(suggest.constructor.prototype, {
 			renderSuggestion(old) {
-				return function (item: Item, el: HTMLElement) {
+				return function (item: BuiltInSuggestItem, el: HTMLElement) {
 					old.call(this, item, el);
 
 					if (plugin.settings.dev) console.log(item);
@@ -102,17 +96,19 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 
 						render(el, async (containerEl) => {
 							containerEl.setAttribute('data-line', item.node.position.start.line.toString());
-							await MarkdownRenderer.render(
-								app, text, containerEl, item.file.path, this.manager
-							);
+							await MarkdownRenderer.render(app, text, containerEl, item.file.path, this.manager);
 							containerEl.querySelectorAll('.copy-code-button').forEach((el) => el.remove());
 						});
 					}
 				}
 			}
 		}));
+	}
 
+	patchSetSelectedItem() {
+		const plugin = this;
 
+		const suggest = this.getSuggest();
 		this.register(around(suggest.suggestions.constructor.prototype, {
 			setSelectedItem(old) {
 				return function (index: number, event: KeyboardEvent | null) {
@@ -121,11 +117,39 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 					if (this.chooser !== plugin.getSuggest()) return;
 
 					if (event && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
-						const item = getSelectedItem(this.chooser as BuiltInSuggest);
-						(this.chooser as BuiltInSuggest).manager.spawnPreview(item, plugin.settings.lazyHide);
+						const item = getSelectedItem(this);
+						this.chooser.manager.spawnPreview(item, plugin.settings.lazyHide);
 					}
 				}
 			}
 		}))
+
+	}
+
+	patch<T>(suggestClass: new (...args: any[]) => Suggester<T>, itemNormalizer?: (item: T) => SuggestItem) {
+		const prototype = suggestClass.prototype;
+		const plugin = this;
+
+		const uninstaller = around(prototype, {
+			open(old) {
+				return function () {
+					old.call(this);
+					const self = this as PatchedSuggester<T>;
+					if (!self.manager) self.manager = new PopoverManager<T>(plugin, self, itemNormalizer);
+					self.manager.load();
+				}
+			},
+			close(old) {
+				return function () {
+					if (plugin.settings.disableClose) return;
+					old.call(this);
+					this.manager.unload();
+				}
+			}
+		});
+
+		this.register(uninstaller);
+
+		return uninstaller;
 	}
 }

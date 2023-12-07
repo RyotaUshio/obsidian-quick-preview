@@ -1,5 +1,15 @@
 import { Loc, SearchMatches, TFile } from "obsidian";
 
+export interface FileInfo {
+    type: "file";
+    file: TFile;
+}
+
+export interface QuickSwitcherItem extends FileInfo {
+    match: any;
+    downranked?: boolean;
+}
+
 export interface LinkInfo {
     file: TFile;
     matches: SearchMatches | null;

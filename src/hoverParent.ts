@@ -1,15 +1,15 @@
 import { HoverParent, HoverPopover } from "obsidian";
 
-import { BuiltInSuggest } from "main";
+import { PatchedSuggester } from "main";
 import { PopoverManager } from "popoverManager";
 
 
-export class QuickPreviewHoverParent implements HoverParent {
+export class QuickPreviewHoverParent<T> implements HoverParent {
     #hoverPopover: HoverPopover | null = null;
     hidden: boolean;
-    manager: PopoverManager;
+    manager: PopoverManager<T>;
 
-    constructor(private suggest: BuiltInSuggest) {
+    constructor(private suggest: PatchedSuggester<T>) {
         this.hidden = false;
         this.manager = this.suggest.manager;
     }

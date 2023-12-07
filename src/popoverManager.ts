@@ -1,24 +1,34 @@
-import { Component, Keymap, KeymapEventHandler, stripHeadingForLink } from "obsidian";
+import { Component, Keymap, KeymapEventHandler, PopoverSuggest, SuggestModal, stripHeadingForLink } from "obsidian";
 
-import EnhancedLinkSuggestionsPlugin, { BuiltInSuggest, Item } from "main";
+import EnhancedLinkSuggestionsPlugin, { PatchedSuggester, SuggestItem } from "main";
 import { QuickPreviewHoverParent } from "hoverParent";
 import { getSelectedItem } from "utils";
+import { Suggestions } from "typings/obsidian";
 
 
-export class PopoverManager extends Component {
-    currentHoverParent: QuickPreviewHoverParent | null = null;
-    currentOpenHoverParent: QuickPreviewHoverParent | null = null;
+export class PopoverManager<T> extends Component {
+    currentHoverParent: QuickPreviewHoverParent<T> | null = null;
+    currentOpenHoverParent: QuickPreviewHoverParent<T> | null = null;
     handlers: KeymapEventHandler[] = [];
+    suggestions: Suggestions<T>;
+    itemNormalizer: (item: T) => SuggestItem;
 
-    constructor(private plugin: EnhancedLinkSuggestionsPlugin, private suggest: BuiltInSuggest) {
+    constructor(private plugin: EnhancedLinkSuggestionsPlugin, private suggest: PatchedSuggester<T>, itemNormalizer?: (item: T) => SuggestItem) {
         super();
+
+        if (suggest instanceof PopoverSuggest) this.suggestions = suggest.suggestions;
+        else if (suggest instanceof SuggestModal) this.suggestions = suggest.chooser;
+
+        if (!this.suggestions) throw new Error("No suggestions provided nor can be inferred.");
+
+        this.itemNormalizer = itemNormalizer ?? ((item: T) => item as unknown as SuggestItem);
     }
 
     onload() {
         this.registerDomEvent(window, 'keydown', (event) => {
             if (this.suggest.isOpen && Keymap.isModifier(event, this.plugin.settings.modifierToPreview)) {
-                const item = getSelectedItem(this.suggest);
-                this.spawnPreview(item);
+                const item = getSelectedItem(this.suggestions);
+                this.spawnPreview(this.itemNormalizer(item));
             }
         });
         this.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
@@ -27,11 +37,11 @@ export class PopoverManager extends Component {
 
         this.handlers.push(
             this.suggest.scope.register([this.plugin.settings.modifierToPreview], 'ArrowUp', (event) => {
-                this.suggest.suggestions.moveUp(event);
+                this.suggestions.moveUp(event);
                 return false;
             }),
             this.suggest.scope.register([this.plugin.settings.modifierToPreview], 'ArrowDown', (event) => {
-                this.suggest.suggestions.moveDown(event);
+                this.suggestions.moveDown(event);
                 return false;
             })
         );
@@ -46,7 +56,7 @@ export class PopoverManager extends Component {
         this.currentHoverParent = null;
     }
 
-    spawnPreview(item: Item, lazyHide: boolean = false) {
+    spawnPreview(item: SuggestItem, lazyHide: boolean = false) {
         this.hide(lazyHide);
 
         this.currentHoverParent = new QuickPreviewHoverParent(this.suggest);
