@@ -69,6 +69,8 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 					old.call(this, index, event);
 
 					if (this.chooser.manager instanceof PopoverManager) {
+						if (plugin.settings.log) console.log(getSelectedItem(this));
+
 						if (event && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
 							const item = getSelectedItem(this);
 							this.chooser.manager.spawnPreview(item, plugin.settings.lazyHide);
