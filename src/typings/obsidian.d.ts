@@ -1,3 +1,4 @@
+import { UserEvent } from "obsidian";
 import { Suggester } from "./suggest";
 
 export interface Suggestions<T> {
@@ -7,7 +8,7 @@ export interface Suggestions<T> {
     containerEl: HTMLElement;
     moveUp(event: KeyboardEvent): void;
     moveDown(event: KeyboardEvent): void;
-    setSelectedItem(index: number, event: KeyboardEvent | null): void;
+    setSelectedItem(index: number, event: UserEvent | null): void;
 }
 
 declare module "obsidian" {
@@ -38,6 +39,10 @@ declare module "obsidian" {
     }
 
     interface HoverPopover {
+        parent: HoverParent;
+        targetEl: HTMLElement | null;
+        shownPos: { x: number, y: number, doc: Document } | null;
         hide(): void;
+        position(pos: { x: number, y: number, doc: Document } | null): void;
     }
 }

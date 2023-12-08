@@ -36,7 +36,7 @@ export class QuickPreviewHoverParent<T> implements HoverParent {
                 this.hide();
                 return;
             };
-            this.#hoverPopover.hoverEl.addClass('enhanced-link-suggestions');
+            this.#hoverPopover.hoverEl.addClass('quick-preview');
         }
     }
 }

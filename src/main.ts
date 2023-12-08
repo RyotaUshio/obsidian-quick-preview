@@ -1,15 +1,17 @@
-import { HoverParent, Keymap, Plugin } from 'obsidian';
+import { HoverParent, HoverPopover, Keymap, Plugin, PopoverSuggest, UserEvent } from 'obsidian';
 import { around } from 'monkey-around';
 
-import { DEFAULT_SETTINGS, EnhancedLinkSuggestionsSettings, EnhancedLinkSuggestionsSettingTab } from 'settings';
+import { DEFAULT_SETTINGS, QuickPreviewSettings, QuickPreviewSettingTab } from 'settings';
 import { PopoverManager } from 'popoverManager';
 import { getSelectedItem } from 'utils';
 import { BuiltInSuggest, BuiltInSuggestItem, PatchedSuggester, QuickSwitcherItem, Suggester, SuggestItem } from 'typings/suggest';
 import { ReloadModal } from 'reload';
+import { QuickPreviewHoverParent } from 'hoverParent';
+import { Suggestions } from 'typings/obsidian';
 
 
-export default class EnhancedLinkSuggestionsPlugin extends Plugin {
-	settings: EnhancedLinkSuggestionsSettings;
+export default class QuickPreviewPlugin extends Plugin {
+	settings: QuickPreviewSettings;
 	#originalOnLinkHover: (hoverParent: HoverParent, targetEl: HTMLElement | null, linktext: string, sourcePath: string, state?: any) => any;
 
 	async onload() {
@@ -26,7 +28,7 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 
 		await this.loadSettings();
 		await this.saveSettings();
-		this.addSettingTab(new EnhancedLinkSuggestionsSettingTab(this));
+		this.addSettingTab(new QuickPreviewSettingTab(this));
 
 		this.app.workspace.onLayoutReady(() => {
 			this.patchSetSelectedItem();
@@ -45,6 +47,7 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 			// @ts-ignore
 			this.patchSuggester(this.getBuiltInSuggest().constructor, itemNormalizer);
 			this.patchSuggester(this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal, itemNormalizer);
+			this.patchHoverPopover();
 		});
 	}
 
@@ -73,24 +76,25 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 		const suggest = this.getBuiltInSuggest();
 		this.register(around(suggest.suggestions.constructor.prototype, {
 			setSelectedItem(old) {
-				return function (index: number, event: KeyboardEvent | null) {
+				return function (index: number, event: UserEvent | null) {
 					old.call(this, index, event);
 
 					if (this.chooser.manager instanceof PopoverManager) {
+						const manager = this.chooser.manager as PopoverManager<any>;
+
 						if (plugin.settings.log) console.log(getSelectedItem(this));
 
 						if (event && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
-							const item = getSelectedItem(this);
-							this.chooser.manager.spawnPreview(item, plugin.settings.lazyHide);
+							const item = getSelectedItem(this as Suggestions<any>);
+							manager.spawnPreview(item, plugin.settings.lazyHide, event);
 						}
 					}
 				}
 			}
-		}))
-
+		}));
 	}
 
-	patchSuggester<T>(suggestClass: new (...args: any[]) => Suggester<T>, itemNormalizer?: (item: T) => SuggestItem) {
+	patchSuggester<T>(suggestClass: new (...args: any[]) => Suggester<T>, itemNormalizer: (item: T) => SuggestItem) {
 		const prototype = suggestClass.prototype;
 		const plugin = this;
 
@@ -105,7 +109,7 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 			},
 			close(old) {
 				return function () {
-					if (plugin.settings.disableClose) return;
+					if (plugin.settings.disableCloseSuggest) return;
 					old.call(this);
 					this.manager.unload();
 				}
@@ -115,5 +119,23 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 		this.register(uninstaller);
 
 		return uninstaller;
+	}
+
+	patchHoverPopover() {
+		this.register(around(HoverPopover.prototype, {
+			position(old) {
+				return function (pos: { x: number, y: number, doc: Document } | null) {
+					const self = this as HoverPopover;
+
+					if (!(self.parent instanceof QuickPreviewHoverParent)) {
+						old.call(this, pos);
+						return;
+					}
+
+					const shownPos = self.parent.manager.getShownPos();
+					old.call(self, self.shownPos = { ...shownPos, doc: pos?.doc ?? document });
+				}
+			}
+		}));
 	}
 }
