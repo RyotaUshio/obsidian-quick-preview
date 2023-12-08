@@ -4,11 +4,6 @@ This [Obsidian.md](https://obsidian.md) plugin enhances the built-in link sugges
 
 Hold down `Alt`/`Option` (by default) to quickly preview a suggestion before actually selecting it.
 
-> [!note]
-> - This plugin requires the [Page Preview](https://help.obsidian.md/Plugins/Page+preview) core plugin enabled.
-> - When using this plugin together with [Hover Editor](https://github.com/nothingislost/obsidian-hover-editor), you need to reload the app after enabling this plugin.
-> You can do this by running the command "Reload app without saving" or by just re-opening the vault.
-
 > [!tip]
 > - You can adjust the font size for quick preview via [Style Settings](https://github.com/mgmeyers/obsidian-style-settings).
 > - **Other plugins also can utilize the quick preview feature via the API**. See [below](#using-the-api) for more details.
