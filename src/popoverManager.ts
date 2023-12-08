@@ -31,6 +31,11 @@ export class PopoverManager<T> extends Component {
         this.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
             if (event.key === this.plugin.settings.modifierToPreview) this.hide();
         });
+        // This is a workaround for the problem that the keyup event is not fired when command key is released on macOS.
+        // cf.) https://blog.bitsrc.io/keyup-event-and-cmd-problem-88f4038c5ed2
+        this.registerDomEvent(window, 'mousemove', (event: MouseEvent) => {
+            if (!Keymap.isModifier(event, this.plugin.settings.modifierToPreview)) this.hide();
+        });
 
         this.handlers.push(
             this.suggest.scope.register([this.plugin.settings.modifierToPreview], 'ArrowUp', (event) => {
