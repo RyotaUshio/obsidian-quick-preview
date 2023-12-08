@@ -10,7 +10,7 @@ const POSITIONS = ['Auto', 'Top left', 'Top right', 'Bottom left', 'Bottom right
 type Position = typeof POSITIONS[number];
 
 export interface QuickPreviewSettings {
-	modifierToPreview: Modifier;
+	modifier: Modifier;
 	lazyHide: boolean;
 	position: Position;
 	customPositionX: number;
@@ -21,7 +21,7 @@ export interface QuickPreviewSettings {
 }
 
 export const DEFAULT_SETTINGS: QuickPreviewSettings = {
-	modifierToPreview: 'Alt',
+	modifier: 'Alt',
 	lazyHide: true,
 	position: 'Auto',
 	customPositionX: 0,
@@ -112,7 +112,7 @@ export class QuickPreviewSettingTab extends PluginSettingTab {
 	display(): void {
 		this.containerEl.empty();
 
-		this.addDropdowenSetting('modifierToPreview', ['Mod', 'Ctrl', 'Meta', 'Shift', 'Alt'], getModifierNameInPlatform)
+		this.addDropdowenSetting('modifier', ['Mod', 'Ctrl', 'Meta', 'Shift', 'Alt'], getModifierNameInPlatform)
 			.setName('Modifier key to toggle quick preview')
 			.setDesc('Hold down this key to preview a suggestion before selecting it.');
 		this.addDropdowenSetting('position', POSITIONS as unknown as string[], undefined, () => this.display())

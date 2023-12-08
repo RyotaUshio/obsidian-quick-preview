@@ -84,7 +84,7 @@ export default class QuickPreviewPlugin extends Plugin {
 
 						if (plugin.settings.log) console.log(getSelectedItem(this));
 
-						if (event && Keymap.isModifier(event, plugin.settings.modifierToPreview)) {
+						if (event && Keymap.isModifier(event, plugin.settings.modifier)) {
 							const item = getSelectedItem(this as Suggestions<any>);
 							manager.spawnPreview(item, plugin.settings.lazyHide, event);
 						}
