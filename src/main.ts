@@ -5,6 +5,7 @@ import { DEFAULT_SETTINGS, EnhancedLinkSuggestionsSettings, EnhancedLinkSuggesti
 import { PopoverManager } from 'popoverManager';
 import { getSelectedItem } from 'utils';
 import { BuiltInSuggest, BuiltInSuggestItem, PatchedSuggester, QuickSwitcherItem, Suggester, SuggestItem } from 'typings/suggest';
+import { ReloadModal } from 'reload';
 
 
 export default class EnhancedLinkSuggestionsPlugin extends Plugin {
@@ -12,17 +13,20 @@ export default class EnhancedLinkSuggestionsPlugin extends Plugin {
 	#originalOnLinkHover: (hoverParent: HoverParent, targetEl: HTMLElement | null, linktext: string, sourcePath: string, state?: any) => any;
 
 	async onload() {
-		await this.loadSettings();
-		await this.saveSettings();
-		this.addSettingTab(new EnhancedLinkSuggestionsSettingTab(this));
-
 		/**
 		 * Hover Editor completely replaces the core Page Preview plugin's onLinkHover method with its own
 		 * when the workspace's layout gets ready.
 		 * But Hover Editor's version is incompatible with this plugin, so we need to store the original method
 		 * before it's modified by Hover Editor and call it instead.
 		 */
+		if (this.app.workspace.layoutReady && this.app.plugins.enabledPlugins.has('obsidian-hover-editor')) {
+			new ReloadModal(this.app).open();
+		}
 		this.#originalOnLinkHover = this.app.internalPlugins.getPluginById('page-preview').instance.onLinkHover;
+
+		await this.loadSettings();
+		await this.saveSettings();
+		this.addSettingTab(new EnhancedLinkSuggestionsSettingTab(this));
 
 		this.app.workspace.onLayoutReady(() => {
 			this.patchSetSelectedItem();

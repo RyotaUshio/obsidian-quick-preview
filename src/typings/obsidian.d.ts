@@ -21,6 +21,9 @@ declare module "obsidian" {
         internalPlugins: {
             getPluginById(id: string): Plugin & { instance: any };
         }
+        commands: {
+            executeCommandById(id: string): boolean;
+        }
     }
 
     interface PopoverSuggest<T> {

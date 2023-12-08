@@ -32,8 +32,11 @@ export class QuickPreviewHoverParent<T> implements HoverParent {
             this.manager.addChild(this.#hoverPopover);
             this.manager.currentOpenHoverParent?.hide();
             this.manager.currentOpenHoverParent = this;
-            if (this.hidden) this.hide();
-            else this.#hoverPopover.hoverEl.addClass('enhanced-link-suggestions');
+            if (this.hidden) {
+                this.hide();
+                return;
+            };
+            this.#hoverPopover.hoverEl.addClass('enhanced-link-suggestions');
         }
     }
 }
