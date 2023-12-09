@@ -1,10 +1,11 @@
+import { stripHeadingForLink } from 'obsidian';
 import { HoverParent, HoverPopover, Keymap, Plugin, PopoverSuggest, UserEvent } from 'obsidian';
 import { around } from 'monkey-around';
 
 import { DEFAULT_SETTINGS, QuickPreviewSettings, QuickPreviewSettingTab } from 'settings';
 import { PopoverManager } from 'popoverManager';
 import { getSelectedItem } from 'utils';
-import { BuiltInSuggest, BuiltInSuggestItem, PatchedSuggester, QuickSwitcherItem, Suggester, SuggestItem } from 'typings/suggest';
+import { BuiltInSuggest, BuiltInSuggestItem, PatchedSuggester, QuickSwitcherItem, Suggester, PreviewInfo } from 'typings/suggest';
 import { ReloadModal } from 'reload';
 import { QuickPreviewHoverParent } from 'hoverParent';
 import { Suggestions } from 'typings/obsidian';
@@ -32,18 +33,11 @@ export default class QuickPreviewPlugin extends Plugin {
 
 		this.app.workspace.onLayoutReady(() => {
 			this.patchSetSelectedItem();
-			const itemNormalizer = (item: BuiltInSuggestItem | QuickSwitcherItem): SuggestItem => {
-				item.path = item.file.path;
-				if (item.type === "alias") {
-					return { type: "file", path: item.file.path };
-				} else if (item.type === "block") {
-					return {
-						type: "block",
-						path: item.file.path,
-						line: item.node.position.start.line,
-					};
-				}
-				return item;
+			const itemNormalizer = (item: BuiltInSuggestItem | QuickSwitcherItem): PreviewInfo => {
+				const info: PreviewInfo = { linktext: item.file.path, sourcePath: '' };
+				if (item.type === "heading") info.linktext += '#' + stripHeadingForLink(item.heading);
+				else if (item.type === "block") info.line = item.node.position.start.line;
+				return info;
 			};
 			// @ts-ignore
 			this.patchSuggester(this.getBuiltInSuggest().constructor, itemNormalizer);
@@ -87,7 +81,7 @@ export default class QuickPreviewPlugin extends Plugin {
 
 						if (event && Keymap.isModifier(event, plugin.settings.modifier)) {
 							const item = getSelectedItem(this as Suggestions<any>);
-							manager.spawnPreview(item, plugin.settings.lazyHide, event);
+							if (item) manager.spawnPreview(item, plugin.settings.lazyHide, event);
 						}
 					}
 				}
@@ -95,7 +89,7 @@ export default class QuickPreviewPlugin extends Plugin {
 		}));
 	}
 
-	patchSuggester<T>(suggestClass: new (...args: any[]) => Suggester<T>, itemNormalizer: (item: T) => SuggestItem) {
+	patchSuggester<T>(suggestClass: new (...args: any[]) => Suggester<T>, itemNormalizer: (item: T) => PreviewInfo) {
 		const prototype = suggestClass.prototype;
 		const plugin = this;
 
@@ -133,8 +127,7 @@ export default class QuickPreviewPlugin extends Plugin {
 						return;
 					}
 
-					const shownPos = self.parent.manager.getShownPos();
-					old.call(self, self.shownPos = { ...shownPos, doc: pos?.doc ?? document });
+					old.call(self, self.shownPos = self.parent.manager.getShownPos());
 				}
 			}
 		}));

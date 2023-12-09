@@ -1,10 +1,10 @@
-import { Component, Keymap, KeymapEventHandler, PopoverSuggest, UserEvent, stripHeadingForLink } from "obsidian";
+import { Component, Keymap, KeymapEventHandler, PopoverSuggest, UserEvent } from "obsidian";
 
 import EnhancedLinkSuggestionsPlugin from "main";
 import { QuickPreviewHoverParent } from "hoverParent";
 import { getSelectedItem } from "utils";
 import { Suggestions } from "typings/obsidian";
-import { PatchedSuggester, SuggestItem } from "typings/suggest";
+import { PatchedSuggester, PreviewInfo } from "typings/suggest";
 
 
 export class PopoverManager<T> extends Component {
@@ -14,7 +14,7 @@ export class PopoverManager<T> extends Component {
     lastEvent: MouseEvent | PointerEvent | null = null;
     handlers: KeymapEventHandler[] = [];
 
-    constructor(private plugin: EnhancedLinkSuggestionsPlugin, public suggest: PatchedSuggester<T>, private itemNormalizer: (item: T) => SuggestItem) {
+    constructor(private plugin: EnhancedLinkSuggestionsPlugin, public suggest: PatchedSuggester<T>, private itemNormalizer: (item: T) => PreviewInfo) {
         super();
 
         if (suggest instanceof PopoverSuggest) this.suggestions = suggest.suggestions;
@@ -25,7 +25,7 @@ export class PopoverManager<T> extends Component {
         this.registerDomEvent(window, 'keydown', (event) => {
             if (this.suggest.isOpen && Keymap.isModifier(event, this.plugin.settings.modifier)) {
                 const item = getSelectedItem(this.suggestions);
-                if (item) this.spawnPreview(this.itemNormalizer(item));
+                if (item) this.spawnPreview(item);
             }
         });
         this.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
@@ -65,19 +65,15 @@ export class PopoverManager<T> extends Component {
         this.currentHoverParent = null;
     }
 
-    spawnPreview(item: SuggestItem, lazyHide: boolean = false, event: UserEvent | null = null) {
+    spawnPreview(item: T, lazyHide: boolean = false, event: UserEvent | null = null) {
         this.hide(lazyHide);
 
         if (event instanceof MouseEvent || event instanceof PointerEvent) this.lastEvent = event;
 
         this.currentHoverParent = new QuickPreviewHoverParent(this.suggest);
-        if (item.type === 'file') {
-            this.plugin.onLinkHover(this.currentHoverParent, null, item.path, '');
-        } else if (item.type === 'heading') {
-            this.plugin.onLinkHover(this.currentHoverParent, null, item.path + '#' + stripHeadingForLink(item.heading), '');
-        } else if (item.type === 'block') {
-            this.plugin.onLinkHover(this.currentHoverParent, null, item.path, '', { scroll: item.line });
-        }
+
+        const info: PreviewInfo = this.itemNormalizer(item);
+        this.plugin.onLinkHover(this.currentHoverParent, null, info.linktext, info.sourcePath, { scroll: info.line });
     };
 
     getShownPos(): { x: number, y: number } {

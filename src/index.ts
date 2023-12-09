@@ -1,8 +1,8 @@
-export { type SuggestItem, type FileInfo, type HeadingInfo, type BlockInfo } from 'typings/suggest';
+export { type PreviewInfo } from 'typings/suggest';
 
-import EnhancedLinkSuggestionsPlugin from "main";
+import QuickPreviewPlugin from "main";
 import { App, Component, PopoverSuggest, SuggestModal } from "obsidian";
-import { SuggestItem } from 'typings/suggest';
+import { PreviewInfo } from 'typings/suggest';
 
 /**
  * Check if the Enhanced Link Suggestions plugin is enabled. Even if it returns true, it doesn't mean 
@@ -21,9 +21,9 @@ export function isPluginEnabled(app: App): boolean {
  * @param suggestClass A suggester class to be patched. `PopoverSuggest` (e.g. `EditorSuggest` & `AbstractInputSuggest`) or `SuggestModal` are supported.
  * @param itemNormalizer A function that converts an item of the suggester to a `SuggestItem` object.
  */
-export function registerQuickPreview<T>(app: App, component: Component, suggestClass: new (...args: any[]) => PopoverSuggest<T> | SuggestModal<T>, itemNormalizer: (item: T) => SuggestItem): void {
+export function registerQuickPreview<T>(app: App, component: Component, suggestClass: new (...args: any[]) => PopoverSuggest<T> | SuggestModal<T>, itemNormalizer: (item: T) => PreviewInfo): void {
     app.workspace.onLayoutReady(() => {
-        const plugin = app.plugins.getPlugin("quick-preview") as EnhancedLinkSuggestionsPlugin | undefined;
+        const plugin = app.plugins.getPlugin("quick-preview") as QuickPreviewPlugin | undefined;
         if (!plugin) throw Error("Quick Preview API: Quick Preview is not enabled.");
         const uninstaller = plugin.patchSuggester(suggestClass, itemNormalizer);
         component.register(uninstaller);

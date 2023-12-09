@@ -41,8 +41,8 @@ declare module "obsidian" {
     interface HoverPopover {
         parent: HoverParent;
         targetEl: HTMLElement | null;
-        shownPos: { x: number, y: number, doc: Document } | null;
+        shownPos: { x: number, y: number } | null;
         hide(): void;
-        position(pos: { x: number, y: number, doc: Document } | null): void;
+        position(pos: { x: number, y: number } | null): void;
     }
 }

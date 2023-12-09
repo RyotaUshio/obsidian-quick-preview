@@ -1,37 +1,25 @@
 import { EditorSuggest, Loc, PopoverSuggest, SearchMatches, SuggestModal, TFile } from "obsidian";
 import { PopoverManager } from "popoverManager";
 
-
-export type SuggestItem = FileInfo | HeadingInfo | BlockInfo;
-export type BuiltInSuggestItem = FileLinkInfo | AliasLinkInfo | HeadingLinkInfo | BlockLinkInfo;
+export type BuiltInSuggestItem = FileLinkSuggestItem | AliasLinkSuggestItem | HeadingLinkSuggestItem | BlockLinkSuggestItem;
 export type BuiltInSuggest = EditorSuggest<BuiltInSuggestItem> & { manager: PopoverManager<BuiltInSuggestItem> };
 export type Suggester<T> = PopoverSuggest<T> | SuggestModal<T>;
 export type PatchedSuggester<T> = Suggester<T> & { manager: PopoverManager<T> };
 
-export interface FileInfo {
+export interface PreviewInfo {
+    linktext: string;
+    sourcePath: string;
+    line?: number;
+}
+
+export interface QuickSwitcherItem {
     type: "file";
-    path: string;
-}
-
-export interface HeadingInfo {
-    type: "heading";
-    path: string;
-    heading: string;
-}
-
-export interface BlockInfo {
-    type: "block";
-    path: string;
-    line: number;
-}
-
-export interface QuickSwitcherItem extends FileInfo {
     file: TFile;
     match: any;
     downranked?: boolean;
 }
 
-export interface LinkInfo {
+export interface LinkSuggestItem {
     file: TFile;
     matches: SearchMatches | null;
     path: string;
@@ -39,21 +27,21 @@ export interface LinkInfo {
     subpath?: string;
 }
 
-export interface FileLinkInfo extends LinkInfo {
+export interface FileLinkSuggestItem extends LinkSuggestItem {
     type: "file";
 }
 
-export interface AliasLinkInfo extends LinkInfo {
+export interface AliasLinkSuggestItem extends LinkSuggestItem {
     type: "alias";
 }
 
-export interface HeadingLinkInfo extends LinkInfo {
+export interface HeadingLinkSuggestItem extends LinkSuggestItem {
     type: "heading";
     heading: string;
     level: number;
 }
 
-interface BlockLinkInfo extends LinkInfo {
+interface BlockLinkSuggestItem extends LinkSuggestItem {
     type: "block";
     node: Node;
 }
