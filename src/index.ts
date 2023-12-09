@@ -9,7 +9,7 @@ import { SuggestItem } from 'typings/suggest';
  * the plugin has already been loaded at the moment.
  */
 export function isPluginEnabled(app: App): boolean {
-    return app.plugins.enabledPlugins.has("enhanced-link-suggestions");
+    return app.plugins.enabledPlugins.has("quick-preview");
 }
 
 /**
@@ -23,8 +23,8 @@ export function isPluginEnabled(app: App): boolean {
  */
 export function registerQuickPreview<T>(app: App, component: Component, suggestClass: new (...args: any[]) => PopoverSuggest<T> | SuggestModal<T>, itemNormalizer: (item: T) => SuggestItem): void {
     app.workspace.onLayoutReady(() => {
-        const plugin = app.plugins.getPlugin("enhanced-link-suggestions") as EnhancedLinkSuggestionsPlugin | undefined;
-        if (!plugin) throw Error("Enhanced Link Suggestions API: Enhanced Link Suggestions is not enabled.");
+        const plugin = app.plugins.getPlugin("quick-preview") as EnhancedLinkSuggestionsPlugin | undefined;
+        if (!plugin) throw Error("Quick Preview API: Quick Preview is not enabled.");
         const uninstaller = plugin.patchSuggester(suggestClass, itemNormalizer);
         component.register(uninstaller);
     })
