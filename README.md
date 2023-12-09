@@ -39,11 +39,16 @@ import { registerQuickPreview } from "obsidian-quick-preview";
 export default MyPlugin extends Plugin {
     onload() {
         registerQuickPreview(this.app, this, MyCustomEditorSuggest, (item) => {
-            return { type: "file", file: item.file }
+			// - `linktext` can be a string representing any proper link,
+            //   e.g. "note", "note.md", "folder/note", "folder/note.md", "note#heading", "note#^block-id" etc
+			// - `sourcePath` is the path of the file where the link is stored in, used to compute relative links.
+	        //   In many cases, you can just pass an empty string.
+            return { linktext: "folder/note.md", sourcePath: "" };
         });
         // or
         registerQuickPreview(this.app, this, MyCustomSuggestModal, (item) => {
-            return { type: "file", file: item.file }
+            // Add a `line` parameter to focus on a specific line.
+            return { linktext: "note", sourcePath: "folder/memo.md", line: 10 }
         });
     }
 }
