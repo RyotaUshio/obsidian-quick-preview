@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-quick-preview",
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"description": "An Obsidian.md plugin to quickly preview a suggestion before selecting it in link suggestions & quick swicher.",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
@@ -10,7 +10,7 @@
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"lib": "tsc --project tsconfig-lib.json",
+		"lib": "rm -rf lib && tsc --project tsconfig-lib.json",
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
 		"publish": "npm run lib && npm publish"
 	},
