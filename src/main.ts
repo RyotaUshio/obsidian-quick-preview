@@ -112,7 +112,7 @@ export default class QuickPreviewPlugin extends Plugin {
 				return function () {
 					if (plugin.settings.disableCloseSuggest) return;
 					old.call(this);
-					this.manager.unload();
+					this.manager?.unload(); // close() can be called before open() at startup, so we need the optional chaining (?.)
 				}
 			}
 		});
