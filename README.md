@@ -22,7 +22,12 @@ But you can install the latest beta release using [BRAT](https://github.com/TfTH
 
 ## Using the API
 
-This plugin provides an API to allow other plugins to utilize the quick preview feature.
+This plugin provides an API to allow other plugins to add the quick preview functionality to their custom suggesters. Supported suggester types are:
+
+- [`SuggestModal`](https://docs.obsidian.md/Reference/TypeScript+API/SuggestModal)
+- [`PopoverSuggest`](https://docs.obsidian.md/Reference/TypeScript+API/PopoverSuggest), including:
+  - [`EditorSuggest`](https://docs.obsidian.md/Reference/TypeScript+API/EditorSuggest)
+  - [`AbstractInputSuggest`](https://docs.obsidian.md/Reference/TypeScript+API/AbstractInputSuggest)
 
 ### Installation
 
@@ -33,8 +38,12 @@ npm install -D obsidian-quick-preview
 ### Usage
 
 ```ts
-import { Plugin } from "obsidian";
+import { Plugin, EditorSuggest, SuggestModal, TFile, SectionCache } from "obsidian";
 import { registerQuickPreview } from "obsidian-quick-preview";
+
+class MyCustomEditorSuggest extends EditorSuggest<{ file: TFile }> { ... }
+
+class MyCustomSuggestModal extends SuggestModal<{ path: string, cache: SectionCache }> { ... }
 
 export default MyPlugin extends Plugin {
     onload() {
@@ -42,12 +51,12 @@ export default MyPlugin extends Plugin {
             // - `linktext` can be any string representing a proper internal link,
             //   e.g. "note", "note.md", "folder/note", "folder/note.md", "note#heading", "note#^block-id" etc
             // - `sourcePath` is used to resolve relative links. In many cases, you can just pass an empty string.
-            return { linktext: "folder/note.md", sourcePath: "" };
+            return { linktext: item.file.path, sourcePath: "" };
         });
         // or
         registerQuickPreview(this.app, this, MyCustomSuggestModal, (item) => {
             // Add a `line` parameter to focus on a specific line.
-            return { linktext: "note", sourcePath: "folder/memo.md", line: 10 }
+            return { linktext: item.path, sourcePath: "", line: item.cache.position.start.line };
         });
     }
 }
