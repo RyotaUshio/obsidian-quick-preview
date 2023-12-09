@@ -72,11 +72,11 @@ export class PopoverManager<T> extends Component {
 
         this.currentHoverParent = new QuickPreviewHoverParent(this.suggest);
         if (item.type === 'file') {
-            this.plugin.onLinkHover(this.currentHoverParent, null, item.file.path, '');
+            this.plugin.onLinkHover(this.currentHoverParent, null, item.path, '');
         } else if (item.type === 'heading') {
-            this.plugin.onLinkHover(this.currentHoverParent, null, item.file.path + '#' + stripHeadingForLink(item.heading), '');
+            this.plugin.onLinkHover(this.currentHoverParent, null, item.path + '#' + stripHeadingForLink(item.heading), '');
         } else if (item.type === 'block') {
-            this.plugin.onLinkHover(this.currentHoverParent, null, item.file.path, '', { scroll: item.line });
+            this.plugin.onLinkHover(this.currentHoverParent, null, item.path, '', { scroll: item.line });
         }
     };
 

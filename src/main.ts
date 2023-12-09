@@ -33,12 +33,13 @@ export default class QuickPreviewPlugin extends Plugin {
 		this.app.workspace.onLayoutReady(() => {
 			this.patchSetSelectedItem();
 			const itemNormalizer = (item: BuiltInSuggestItem | QuickSwitcherItem): SuggestItem => {
+				item.path = item.file.path;
 				if (item.type === "alias") {
-					return { type: "file", file: item.file };
+					return { type: "file", path: item.file.path };
 				} else if (item.type === "block") {
 					return {
 						type: "block",
-						file: item.file,
+						path: item.file.path,
 						line: item.node.position.start.line,
 					};
 				}

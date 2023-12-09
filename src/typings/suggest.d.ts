@@ -10,22 +10,23 @@ export type PatchedSuggester<T> = Suggester<T> & { manager: PopoverManager<T> };
 
 export interface FileInfo {
     type: "file";
-    file: TFile;
+    path: string;
 }
 
 export interface HeadingInfo {
     type: "heading";
-    file: TFile;
+    path: string;
     heading: string;
 }
 
 export interface BlockInfo {
     type: "block";
-    file: TFile;
+    path: string;
     line: number;
 }
 
 export interface QuickSwitcherItem extends FileInfo {
+    file: TFile;
     match: any;
     downranked?: boolean;
 }
