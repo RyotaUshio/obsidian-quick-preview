@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-quick-preview",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"description": "An Obsidian.md plugin to quickly preview a suggestion before selecting it in link suggestions & quick swicher.",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
