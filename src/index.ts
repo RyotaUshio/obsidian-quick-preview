@@ -5,7 +5,7 @@ import { App, Component, PopoverSuggest, SuggestModal } from "obsidian";
 import { PreviewInfo } from 'typings/suggest';
 
 /**
- * Check if the Enhanced Link Suggestions plugin is enabled. Even if it returns true, it doesn't mean 
+ * Check if the Quick Preview plugin is enabled. Even if it returns true, it doesn't mean 
  * the plugin has already been loaded at the moment.
  */
 export function isPluginEnabled(app: App): boolean {
@@ -13,7 +13,7 @@ export function isPluginEnabled(app: App): boolean {
 }
 
 /**
- * Register a suggester class (`PopoverSuggest` (e.g. `EditorSuggest` & `AbstractInputSuggest`) or `SuggestModal`) to be patched by Enhanced Link Suggestions
+ * Register a suggester class (`PopoverSuggest` (e.g. `EditorSuggest` & `AbstractInputSuggest`) or `SuggestModal`) to be patched
  * so that it can be used with Quick Preview.
  * 
  * @param app 

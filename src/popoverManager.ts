@@ -1,6 +1,6 @@
 import { Component, Keymap, KeymapEventHandler, PopoverSuggest, UserEvent } from "obsidian";
 
-import EnhancedLinkSuggestionsPlugin from "main";
+import QuickPreviewPlugin from "main";
 import { QuickPreviewHoverParent } from "hoverParent";
 import { getSelectedItem } from "utils";
 import { Suggestions } from "typings/obsidian";
@@ -14,7 +14,7 @@ export class PopoverManager<T> extends Component {
     lastEvent: MouseEvent | PointerEvent | null = null;
     handlers: KeymapEventHandler[] = [];
 
-    constructor(private plugin: EnhancedLinkSuggestionsPlugin, public suggest: PatchedSuggester<T>, private itemNormalizer: (item: T) => PreviewInfo) {
+    constructor(private plugin: QuickPreviewPlugin, public suggest: PatchedSuggester<T>, private itemNormalizer: (item: T) => PreviewInfo) {
         super();
 
         if (suggest instanceof PopoverSuggest) this.suggestions = suggest.suggestions;
