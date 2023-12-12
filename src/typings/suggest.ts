@@ -4,7 +4,7 @@ import { PopoverManager } from "popoverManager";
 export type BuiltInSuggestItem = FileLinkSuggestItem | AliasLinkSuggestItem | HeadingLinkSuggestItem | BlockLinkSuggestItem;
 export type BuiltInSuggest = EditorSuggest<BuiltInSuggestItem> & { manager: PopoverManager<BuiltInSuggestItem> };
 export type Suggester<T> = PopoverSuggest<T> | SuggestModal<T>;
-export type PatchedSuggester<T> = Suggester<T> & { manager: PopoverManager<T> };
+export type PatchedSuggester<T> = Suggester<T> & { popoverManager: PopoverManager<T> };
 
 export interface PreviewInfo {
     linktext: string;

@@ -1,5 +1,5 @@
 import { stripHeadingForLink } from 'obsidian';
-import { HoverParent, HoverPopover, Keymap, Plugin, PopoverSuggest, UserEvent } from 'obsidian';
+import { HoverParent, Keymap, Plugin, UserEvent } from 'obsidian';
 import { around } from 'monkey-around';
 
 import { DEFAULT_SETTINGS, QuickPreviewSettings, QuickPreviewSettingTab } from 'settings';
@@ -7,7 +7,6 @@ import { PopoverManager } from 'popoverManager';
 import { getSelectedItem } from 'utils';
 import { BuiltInSuggest, BuiltInSuggestItem, PatchedSuggester, QuickSwitcherItem, Suggester, PreviewInfo } from 'typings/suggest';
 import { ReloadModal } from 'reload';
-import { QuickPreviewHoverParent } from 'hoverParent';
 import { Suggestions } from 'typings/obsidian';
 
 
@@ -42,7 +41,7 @@ export default class QuickPreviewPlugin extends Plugin {
 			// @ts-ignore
 			this.patchSuggester(this.getBuiltInSuggest().constructor, itemNormalizer);
 			this.patchSuggester(this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal, itemNormalizer);
-			this.patchHoverPopover();
+			// this.patchHoverPopover();
 		});
 	}
 
@@ -74,8 +73,8 @@ export default class QuickPreviewPlugin extends Plugin {
 				return function (index: number, event: UserEvent | null) {
 					old.call(this, index, event);
 
-					if (this.chooser.manager instanceof PopoverManager) {
-						const manager = this.chooser.manager as PopoverManager<any>;
+					if (this.chooser.popoverManager instanceof PopoverManager) {
+						const manager = this.chooser.popoverManager as PopoverManager<any>;
 
 						if (plugin.settings.log) console.log(getSelectedItem(this));
 
@@ -98,15 +97,15 @@ export default class QuickPreviewPlugin extends Plugin {
 				return function () {
 					old.call(this);
 					const self = this as PatchedSuggester<T>;
-					if (!self.manager) self.manager = new PopoverManager<T>(plugin, self, itemNormalizer);
-					self.manager.load();
+					if (!self.popoverManager) self.popoverManager = new PopoverManager<T>(plugin, self, itemNormalizer);
+					self.popoverManager.load();
 				}
 			},
 			close(old) {
 				return function () {
 					if (plugin.settings.disableCloseSuggest) return;
 					old.call(this);
-					this.manager?.unload(); // close() can be called before open() at startup, so we need the optional chaining (?.)
+					this.popoverManager?.unload(); // close() can be called before open() at startup, so we need the optional chaining (?.)
 				}
 			}
 		});
@@ -116,20 +115,20 @@ export default class QuickPreviewPlugin extends Plugin {
 		return uninstaller;
 	}
 
-	patchHoverPopover() {
-		this.register(around(HoverPopover.prototype, {
-			position(old) {
-				return function (pos: { x: number, y: number, doc: Document } | null) {
-					const self = this as HoverPopover;
+	// patchHoverPopover() {
+	// 	this.register(around(HoverPopover.prototype, {
+	// 		position(old) {
+	// 			return function (pos: { x: number, y: number, doc: Document } | null) {
+	// 				const self = this as HoverPopover;
 
-					if (!(self.parent instanceof QuickPreviewHoverParent)) {
-						old.call(this, pos);
-						return;
-					}
+	// 				if (!(self.parent instanceof QuickPreviewHoverParent)) {
+	// 					old.call(this, pos);
+	// 					return;
+	// 				}
 
-					old.call(self, self.shownPos = self.parent.manager.getShownPos());
-				}
-			}
-		}));
-	}
+	// 				old.call(self, self.shownPos = self.parent.manager.getShownPos());
+	// 			}
+	// 		}
+	// 	}));
+	// }
 }

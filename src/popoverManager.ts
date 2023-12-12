@@ -13,6 +13,8 @@ export class PopoverManager<T> extends Component {
     currentOpenHoverParent: QuickPreviewHoverParent<T> | null = null;
     lastEvent: MouseEvent | PointerEvent | null = null;
     handlers: KeymapEventHandler[] = [];
+    popoverHeight: number | null = null;
+    popoverWidth: number | null = null;
 
     constructor(private plugin: QuickPreviewPlugin, public suggest: PatchedSuggester<T>, private itemNormalizer: (item: T) => PreviewInfo) {
         super();
@@ -102,8 +104,23 @@ export class PopoverManager<T> extends Component {
 
     getShownPosAuto(): { x: number, y: number } {
         const el = this.suggestions.containerEl;
-        const { top, bottom, left, right } = el.getBoundingClientRect();
+        const { top, bottom, left, right, width, height } = el.getBoundingClientRect();
 
+        const popover = this.currentHoverParent?.hoverPopover;
+        this.popoverWidth = popover?.hoverEl.offsetWidth ?? this.popoverWidth ?? null;
+        this.popoverHeight = popover?.hoverEl.offsetHeight ?? this.popoverHeight ?? null;
+
+        if (this.popoverWidth && this.popoverHeight) {
+            // show the popover next to the suggestion box if possible
+            let offsetX = width * 0.1;
+            let offsetY = height * 0.1;
+            if (right - offsetX + this.popoverWidth < window.innerWidth) return { x: right - offsetX, y: top + offsetY };
+            offsetX = width * 0.03;
+            offsetY = height * 0.05;
+            if (left > this.popoverWidth + offsetX) return { x: left - this.popoverWidth - offsetX, y: top + offsetY };
+        }
+
+        // if the popover size is not available, show it on the opposite side of the suggestion box
         const x = (left + right) * 0.5;
         const y = (top + bottom) * 0.5;
 

@@ -11,7 +11,7 @@ export class QuickPreviewHoverParent<T> implements HoverParent {
 
     constructor(private suggest: PatchedSuggester<T>) {
         this.hidden = false;
-        this.manager = this.suggest.manager;
+        this.manager = this.suggest.popoverManager;
     }
 
     hide() {
@@ -37,6 +37,8 @@ export class QuickPreviewHoverParent<T> implements HoverParent {
                 return;
             };
             this.#hoverPopover.hoverEl.addClass('quick-preview');
+            // is requestAnimationFrame necessary here?
+            this.#hoverPopover!.position(this.#hoverPopover!.shownPos = this.manager.getShownPos());
         }
     }
 }
