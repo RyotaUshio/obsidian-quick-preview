@@ -57,7 +57,9 @@ export class PopoverManager<T> extends Component {
         });
         this.handlers.length = 0;
 
+        this.currentHoverParent?.hide();
         this.currentHoverParent = null;
+        this.currentOpenHoverParent?.hide();
         this.currentOpenHoverParent = null;
         this.lastEvent = null;
     }
