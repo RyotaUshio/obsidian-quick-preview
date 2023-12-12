@@ -16,7 +16,7 @@ export class PopoverManager<T> extends Component {
     popoverHeight: number | null = null;
     popoverWidth: number | null = null;
 
-    constructor(private plugin: QuickPreviewPlugin, public suggest: PatchedSuggester<T>, private itemNormalizer: (item: T) => PreviewInfo) {
+    constructor(private plugin: QuickPreviewPlugin, public suggest: PatchedSuggester<T>, private itemNormalizer: (item: T) => PreviewInfo | null) {
         super();
 
         if (suggest instanceof PopoverSuggest) this.suggestions = suggest.suggestions;
@@ -74,8 +74,8 @@ export class PopoverManager<T> extends Component {
 
         this.currentHoverParent = new QuickPreviewHoverParent(this.suggest);
 
-        const info: PreviewInfo = this.itemNormalizer(item);
-        this.plugin.onLinkHover(this.currentHoverParent, null, info.linktext, info.sourcePath, { scroll: info.line });
+        const info = this.itemNormalizer(item);
+        if (info) this.plugin.onLinkHover(this.currentHoverParent, null, info.linktext, info.sourcePath, { scroll: info.line });
     };
 
     getShownPos(): { x: number, y: number } {

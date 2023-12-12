@@ -88,7 +88,7 @@ export default class QuickPreviewPlugin extends Plugin {
 		}));
 	}
 
-	patchSuggester<T>(suggestClass: new (...args: any[]) => Suggester<T>, itemNormalizer: (item: T) => PreviewInfo) {
+	patchSuggester<T>(suggestClass: new (...args: any[]) => Suggester<T>, itemNormalizer: (item: T) => PreviewInfo | null) {
 		const prototype = suggestClass.prototype;
 		const plugin = this;
 
