@@ -35,7 +35,7 @@ This plugin provides an API to allow other plugins to add the quick preview func
 npm install -D obsidian-quick-preview
 ```
 
-### Usage
+### Usage examples
 
 ```ts
 import { Plugin, EditorSuggest, SuggestModal, TFile, SectionCache } from "obsidian";
@@ -46,6 +46,8 @@ class MyCustomEditorSuggest extends EditorSuggest<{ file: TFile }> { ... }
 class MyCustomSuggestModal extends SuggestModal<{ path: string, cache: SectionCache }> { ... }
 
 export default MyPlugin extends Plugin {
+    excludedFiles: string[];
+
     onload() {
         registerQuickPreview(this.app, this, MyCustomEditorSuggest, (item) => {
             // - `linktext` can be any string representing a proper internal link,
@@ -55,6 +57,10 @@ export default MyPlugin extends Plugin {
         });
         // or
         registerQuickPreview(this.app, this, MyCustomSuggestModal, (item) => {
+            if (this.excludedFiles.contains(item.path)) {
+                // Return `null` when you don't want to show a quick preview for the item.
+                return null;
+            }
             // Add a `line` parameter to focus on a specific line.
             return { linktext: item.path, sourcePath: "", line: item.cache.position.start.line };
         });
