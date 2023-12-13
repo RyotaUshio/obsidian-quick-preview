@@ -32,7 +32,8 @@ export default class QuickPreviewPlugin extends Plugin {
 
 		this.app.workspace.onLayoutReady(() => {
 			this.patchSetSelectedItem();
-			const itemNormalizer = (item: BuiltInSuggestItem | QuickSwitcherItem): PreviewInfo => {
+			const itemNormalizer = (item: BuiltInSuggestItem | QuickSwitcherItem): PreviewInfo | null => {
+				if (!item.file) return null;
 				const info: PreviewInfo = { linktext: item.file.path, sourcePath: '' };
 				if (item.type === "heading") info.linktext += '#' + stripHeadingForLink(item.heading);
 				else if (item.type === "block") info.line = item.node.position.start.line;
