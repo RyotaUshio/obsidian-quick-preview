@@ -1,6 +1,9 @@
 # Obsidian Quick Preview
 
-This [Obsidian.md](https://obsidian.md) plugin enhances the built-in link suggestions and quick switcher by adding a quick preview functionality to them.
+This [Obsidian.md](https://obsidian.md) plugin adds a ***quick preview*** functionality to
+- [Link suggestions](https://help.obsidian.md/Linking+notes+and+files/Internal+links#Link+to+a+file),
+- [Quick switcher](https://help.obsidian.md/Plugins/Quick+switcher),
+- and even [Quick switcher++](https://github.com/darlal/obsidian-switcher-plus).
 
 Hold down `Alt`/`Option` (by default) to quickly preview a suggestion before actually selecting it.
 
@@ -8,7 +11,7 @@ Hold down `Alt`/`Option` (by default) to quickly preview a suggestion before act
 
 ![Screen Recording 2023-12-13 at 18 27 42](https://github.com/RyotaUshio/obsidian-quick-preview/assets/72342591/3dec5c7d-e74e-4f8d-a0f3-43e424dbbee9)
 
-### Quick switcher
+### Quick switcher / Quick switcher++
 
 ![Screen Recording 2023-12-13 at 18 24 34](https://github.com/RyotaUshio/obsidian-quick-preview/assets/72342591/4eaae76b-b0fa-425f-a3ff-857b70e9a02a)
 
