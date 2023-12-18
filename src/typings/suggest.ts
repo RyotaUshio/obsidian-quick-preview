@@ -1,4 +1,5 @@
-import { EditorSuggest, Loc, PopoverSuggest, SearchMatches, SuggestModal, TFile } from "obsidian";
+import { QuickSwitcherPlusBookmarkItem } from './suggest';
+import { EditorSuggest, HeadingCache, Loc, PopoverSuggest, Pos, SearchMatches, SuggestModal, TFile } from "obsidian";
 import { PopoverManager } from "popoverManager";
 
 export type BuiltInSuggestItem = FileLinkSuggestItem | AliasLinkSuggestItem | LinkTextSuggestItem | HeadingLinkSuggestItem | BlockLinkSuggestItem;
@@ -17,6 +18,42 @@ export interface QuickSwitcherItem {
     file: TFile;
     match: any;
     downranked?: boolean;
+}
+
+export interface QuickSwitcherPlusItem {
+    file: TFile;
+    type: string;
+    item: any;
+}
+
+export interface QuickSwitcherPlusHeadingItem extends QuickSwitcherPlusItem {
+    type: "headingsList";
+    item: HeadingCache;
+}
+
+export interface QuickSwitcherPlusSymbolItem extends QuickSwitcherPlusItem {
+    type: "symbolList";
+    item: {
+        type: "symbolInfo";
+        symbol: {
+            position: Pos;
+        }
+    }
+}
+
+export interface QuickSwitcherPlusBookmarkItem extends QuickSwitcherPlusItem {
+    type: "bookmark";
+    item: {
+        type: string;
+    }
+}
+
+export interface QuickSwitcherPlusFileBookmarkItem extends QuickSwitcherPlusBookmarkItem {
+    item: {
+        type: "file",
+        path: string;
+        subpath?: string;
+    }
 }
 
 export interface LinkSuggestItem {

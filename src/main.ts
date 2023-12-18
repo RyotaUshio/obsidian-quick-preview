@@ -5,7 +5,7 @@ import { around } from 'monkey-around';
 import { DEFAULT_SETTINGS, QuickPreviewSettings, QuickPreviewSettingTab } from 'settings';
 import { PopoverManager } from 'popoverManager';
 import { getSelectedItem } from 'utils';
-import { BuiltInSuggest, BuiltInSuggestItem, PatchedSuggester, QuickSwitcherItem, Suggester, PreviewInfo } from 'typings/suggest';
+import { BuiltInSuggest, BuiltInSuggestItem, PatchedSuggester, QuickSwitcherItem, Suggester, PreviewInfo, QuickSwitcherPlusHeadingItem, QuickSwitcherPlusSymbolItem, QuickSwitcherPlusFileBookmarkItem } from 'typings/suggest';
 import { ReloadModal } from 'reload';
 import { Suggestions } from 'typings/obsidian';
 
@@ -32,17 +32,26 @@ export default class QuickPreviewPlugin extends Plugin {
 
 		this.app.workspace.onLayoutReady(() => {
 			this.patchSetSelectedItem();
-			const itemNormalizer = (item: BuiltInSuggestItem | QuickSwitcherItem): PreviewInfo | null => {
+			// @ts-ignore
+			this.patchSuggester(this.getBuiltInSuggest().constructor, (item: BuiltInSuggestItem): PreviewInfo | null => {
 				if (!item.file) return null;
 				const info: PreviewInfo = { linktext: item.file.path, sourcePath: '' };
-				if (item.type === "heading") info.linktext += '#' + stripHeadingForLink(item.heading);
-				else if (item.type === "block") info.line = item.node.position.start.line;
+				if (item.type === 'heading') info.linktext += '#' + stripHeadingForLink(item.heading);
+				else if (item.type === 'block') info.line = item.node.position.start.line;
 				return info;
-			};
-			// @ts-ignore
-			this.patchSuggester(this.getBuiltInSuggest().constructor, itemNormalizer);
-			this.patchSuggester(this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal, itemNormalizer);
-			// this.patchHoverPopover();
+			});
+			this.patchSuggester(
+				this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal,
+				(item: QuickSwitcherItem | QuickSwitcherPlusHeadingItem | QuickSwitcherPlusSymbolItem | QuickSwitcherPlusFileBookmarkItem): PreviewInfo | null => {
+					if (!item.file) return null;
+					const info: PreviewInfo = { linktext: item.file.path, sourcePath: '' };
+					// For Quick Switcher++
+					if (item.type === 'headingsList') info.linktext += '#' + stripHeadingForLink(item.item.heading);
+					else if (item.type === 'symbolList') info.line = item.item.symbol.position.start.line;
+					else if (item.type === 'bookmark' && item.item.type === 'file') info.linktext = item.item.path + (item.item.subpath ?? '');
+					return info;
+				}
+			);
 		});
 	}
 
@@ -115,21 +124,4 @@ export default class QuickPreviewPlugin extends Plugin {
 
 		return uninstaller;
 	}
-
-	// patchHoverPopover() {
-	// 	this.register(around(HoverPopover.prototype, {
-	// 		position(old) {
-	// 			return function (pos: { x: number, y: number, doc: Document } | null) {
-	// 				const self = this as HoverPopover;
-
-	// 				if (!(self.parent instanceof QuickPreviewHoverParent)) {
-	// 					old.call(this, pos);
-	// 					return;
-	// 				}
-
-	// 				old.call(self, self.shownPos = self.parent.manager.getShownPos());
-	// 			}
-	// 		}
-	// 	}));
-	// }
 }
