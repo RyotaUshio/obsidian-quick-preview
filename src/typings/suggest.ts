@@ -1,4 +1,3 @@
-import { QuickSwitcherPlusBookmarkItem } from './suggest';
 import { EditorSuggest, HeadingCache, Loc, PopoverSuggest, Pos, SearchMatches, SuggestModal, TFile } from "obsidian";
 import { PopoverManager } from "popoverManager";
 
