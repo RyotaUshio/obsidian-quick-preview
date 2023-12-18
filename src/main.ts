@@ -70,8 +70,7 @@ export default class QuickPreviewPlugin extends Plugin {
 	}
 
 	getBuiltInSuggest(): BuiltInSuggest {
-		// @ts-ignore
-		return this.app.workspace.editorSuggest.suggests[0];
+		return this.app.workspace.editorSuggest.suggests[0] as BuiltInSuggest;
 	}
 
 	patchSetSelectedItem() {

@@ -27,6 +27,17 @@ declare module "obsidian" {
         }
     }
 
+    interface Workspace {
+        editorSuggest: {
+            suggests: EditorSuggest<any>[];
+            currentSuggest: EditorSuggest<any> | null;
+            close(): void;
+            addSuggest(suggest: EditorSuggest<any>): void;
+            removeSuggest(suggest: EditorSuggest<any>): void;
+            reposition(): void;
+        }
+    }
+
     interface PopoverSuggest<T> {
         suggestions: Suggestions<T>;
         suggestEl: HTMLElement;
