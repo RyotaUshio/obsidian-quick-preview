@@ -26,8 +26,11 @@ export class PopoverManager<T> extends Component {
     onload() {
         this.registerDomEvent(window, 'keydown', (event) => {
             if (this.suggest.isOpen && Keymap.isModifier(event, this.plugin.settings.modifier)) {
-                const item = getSelectedItem(this.suggestions);
-                if (item) this.spawnPreview(item);
+                if (this.currentOpenHoverParent) this.hide();
+                else {
+                    const item = getSelectedItem(this.suggestions);
+                    if (item) this.spawnPreview(item);    
+                }
             }
         });
         this.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
