@@ -25,11 +25,19 @@ You can find this plugin in the community plugin browser within Obsidian.
 
 You can also install the latest beta release using [BRAT](https://github.com/TfTHacker/obsidian42-brat):
 
-1.  Install BRAT and enable it.
-2.  Go to `Options`. In the `Beta Plugin List` section, click on the `Add Beta plugin` button.
-3.  Copy and paste `RyotaUshio/obsidian-quick-preview` in the pop-up prompt and click on **Add Plugin**.
-4.  _(Optional but highly recommended)_ Turn on `Auto-update plugins at startup` at the top of the page.
-5.  Go to `Community plugins > Installed plugins`. You will find “Quick Preview” in the list. Click on the toggle button to enable it.
+1. Install the latest version of BRAT and enable it.
+2. Open the following URL in browser: `obsidian://brat?plugin=RyotaUshio/obsidian-quick-preview`.
+3. Click the "Add Plugin" button.
+4. _(Optional but highly recommended)_ In the BRAT settings, turn on `Auto-update plugins at startup` at the top of the page.
+
+## Reporting problems
+
+If you find a problem about this plugin, please report it by filing an issue from [here](https://github.com/RyotaUshio/obsidian-quick-preview/issues).
+
+It'd be helpful if you could attatch the following information:
+
+- Result of the "Show debug info" command
+- Screenshot of the plugin settings
 
 ## Using the API
 
