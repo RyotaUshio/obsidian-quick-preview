@@ -35,7 +35,7 @@ export class QuickPreviewHoverParent<T> implements HoverParent {
             if (this.hidden) {
                 this.hide();
                 return;
-            };
+            }
             this.#hoverPopover.hoverEl.addClass('quick-preview');
             // is requestAnimationFrame necessary here?
             this.#hoverPopover!.position(this.#hoverPopover!.shownPos = this.manager.getShownPos());
