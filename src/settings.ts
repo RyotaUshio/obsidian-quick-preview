@@ -84,7 +84,7 @@ export class QuickPreviewSettingTab extends PluginSettingTab {
 						dropdown.addOption(option, displayName);
 						displayNames.add(displayName);
 					}
-				};
+				}
 				dropdown.setValue(this.plugin.settings[settingName])
 					.onChange(async (value) => {
 						// @ts-ignore
@@ -124,7 +124,7 @@ export class QuickPreviewSettingTab extends PluginSettingTab {
 				.setDesc('Offset relative to the left edge of the window.');
 			this.addNumberSetting('customPositionY')
 				.setName('Custom y coordinate')
-				.setDesc('Offset relative to the top edge of the window.');;
+				.setDesc('Offset relative to the top edge of the window.');
 		}
 		this.addToggleSetting('stickToMouse')
 			.setName('Stick to mouse position')
