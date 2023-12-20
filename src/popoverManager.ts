@@ -67,12 +67,12 @@ export class PopoverManager<T> extends Component {
         this.lastEvent = null;
     }
 
-    hide(lazy: boolean = false) {
+    hide(lazy = false) {
         if (!lazy) this.currentHoverParent?.hide();
         this.currentHoverParent = null;
     }
 
-    spawnPreview(item: T, lazyHide: boolean = false, event: UserEvent | null = null) {
+    spawnPreview(item: T, lazyHide = false, event: UserEvent | null = null) {
         this.hide(lazyHide);
 
         if (event instanceof MouseEvent || event instanceof PointerEvent) this.lastEvent = event;
@@ -81,7 +81,7 @@ export class PopoverManager<T> extends Component {
 
         const info = this.itemNormalizer(item);
         if (info) this.plugin.onLinkHover(this.currentHoverParent, null, info.linktext, info.sourcePath, { scroll: info.line });
-    };
+    }
 
     getShownPos(): { x: number, y: number } {
         if (this.plugin.settings.stickToMouse && this.lastEvent) return { x: this.lastEvent.clientX, y: this.lastEvent.clientY };
