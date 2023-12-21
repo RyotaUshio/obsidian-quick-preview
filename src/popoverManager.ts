@@ -67,12 +67,12 @@ export class PopoverManager<T> extends Component {
         this.lastEvent = null;
     }
 
-    hide(lazy = false) {
+    hide(lazy: boolean = false) {
         if (!lazy) this.currentHoverParent?.hide();
         this.currentHoverParent = null;
     }
 
-    spawnPreview(item: T, lazyHide = false, event: UserEvent | null = null) {
+    spawnPreview(item: T, lazyHide: boolean = false, event: UserEvent | null = null) {
         this.hide(lazyHide);
 
         if (event instanceof MouseEvent || event instanceof PointerEvent) this.lastEvent = event;
