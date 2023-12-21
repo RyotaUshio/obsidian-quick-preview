@@ -3,16 +3,16 @@ import { Suggestions } from "typings/obsidian";
 
 
 export function getModifierNameInPlatform(mod: Modifier): string {
-    if (mod == "Mod") {
+    if (mod === "Mod") {
         return Platform.isMacOS || Platform.isIosApp ? "Command" : "Ctrl";
     }
-    if (mod == "Shift") {
+    if (mod === "Shift") {
         return "Shift";
     }
-    if (mod == "Alt") {
+    if (mod === "Alt") {
         return Platform.isMacOS || Platform.isIosApp ? "Option" : "Alt";
     }
-    if (mod == "Meta") {
+    if (mod === "Meta") {
         return Platform.isMacOS || Platform.isIosApp ? "Command" : Platform.isWin ? "Win" : "Meta";
     }
     return "Ctrl";

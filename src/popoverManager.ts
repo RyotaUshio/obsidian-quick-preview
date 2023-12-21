@@ -81,7 +81,7 @@ export class PopoverManager<T> extends Component {
 
         const info = this.itemNormalizer(item);
         if (info) this.plugin.onLinkHover(this.currentHoverParent, null, info.linktext, info.sourcePath, { scroll: info.line });
-    };
+    }
 
     getShownPos(): { x: number, y: number } {
         if (this.plugin.settings.stickToMouse && this.lastEvent) return { x: this.lastEvent.clientX, y: this.lastEvent.clientY };
