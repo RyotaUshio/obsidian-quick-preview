@@ -4,6 +4,7 @@ This [Obsidian.md](https://obsidian.md) plugin adds a ***quick preview*** functi
 - [Link suggestions](https://help.obsidian.md/Linking+notes+and+files/Internal+links),
 - [Quick switcher](https://help.obsidian.md/Plugins/Quick+switcher),
 - and even [Quick switcher++](https://github.com/darlal/obsidian-switcher-plus).
+- ***New in 0.6.0***: Canvas's note/media suggestion is now supported as well!
 
 Hold down `Alt`/`Option` (by default) to quickly preview a suggestion before actually selecting it.
 

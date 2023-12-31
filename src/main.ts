@@ -1,4 +1,4 @@
-import { stripHeadingForLink } from 'obsidian';
+import { stripHeadingForLink, SuggestModal } from 'obsidian';
 import { HoverParent, Keymap, Plugin, UserEvent } from 'obsidian';
 import { around } from 'monkey-around';
 
@@ -52,6 +52,7 @@ export default class QuickPreviewPlugin extends Plugin {
 					return info;
 				}
 			);
+			this.patchCanvasSuggest();
 		});
 	}
 
@@ -122,5 +123,29 @@ export default class QuickPreviewPlugin extends Plugin {
 		this.register(uninstaller);
 
 		return uninstaller;
+	}
+
+	patchCanvasSuggest() {
+		const plugin = this;
+
+		const uninstaller = around(SuggestModal.prototype, {
+			setInstructions(old) {
+				return function (...args: any[]) {
+					old.call(this, ...args);
+					const proto = Object.getPrototypeOf(this);
+					
+					if (this.hasOwnProperty('canvas') && proto.hasOwnProperty('showMarkdownAndCanvas') && proto.hasOwnProperty('showAttachments')) {
+						plugin.patchSuggester(this.constructor, (item: QuickSwitcherItem): PreviewInfo | null => {
+							if (!item.file) return null;
+							return { linktext: item.file.path, sourcePath: '' }
+						});
+
+						uninstaller();
+					}
+				}
+			}
+		});
+
+		this.register(uninstaller);
 	}
 }
