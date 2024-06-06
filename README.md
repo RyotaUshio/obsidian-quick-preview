@@ -1,5 +1,8 @@
 # Obsidian Quick Preview
 
+> [!warning]
+> This plugin is currently not compatible with Obsidian v1.6. I will release the necessary fix shortly.
+
 This [Obsidian.md](https://obsidian.md) plugin adds a ***quick preview*** functionality to
 - [Link suggestions](https://help.obsidian.md/Linking+notes+and+files/Internal+links),
 - [Quick switcher](https://help.obsidian.md/Plugins/Quick+switcher),
