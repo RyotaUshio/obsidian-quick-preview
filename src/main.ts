@@ -1,4 +1,4 @@
-import { stripHeadingForLink, SuggestModal } from 'obsidian';
+import { stripHeadingForLink } from 'obsidian';
 import { HoverParent, Keymap, Plugin, UserEvent } from 'obsidian';
 import { around } from 'monkey-around';
 
@@ -40,8 +40,11 @@ export default class QuickPreviewPlugin extends Plugin {
 				else if (item.type === 'block') info.line = item.node.position.start.line;
 				return info;
 			});
+			const quickSwitcherConstructor = this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal;
+			// Superclass of the Quick Switcher modal, canvas's file suggester modal, etc
+			const generalFileSuggestConstructor = Object.getPrototypeOf(quickSwitcherConstructor);
 			this.patchSuggester(
-				this.app.internalPlugins.getPluginById('switcher').instance.QuickSwitcherModal,
+				generalFileSuggestConstructor,
 				(item: QuickSwitcherItem | QuickSwitcherPlusHeadingItem | QuickSwitcherPlusSymbolItem | QuickSwitcherPlusFileBookmarkItem): PreviewInfo | null => {
 					if (!item.file) return null;
 					const info: PreviewInfo = { linktext: item.file.path, sourcePath: '' };
@@ -52,7 +55,6 @@ export default class QuickPreviewPlugin extends Plugin {
 					return info;
 				}
 			);
-			this.patchCanvasSuggest();
 		});
 	}
 
@@ -104,11 +106,10 @@ export default class QuickPreviewPlugin extends Plugin {
 
 		const uninstaller = around(prototype, {
 			open(old) {
-				return function () {
+				return function (this: PatchedSuggester<T>) {
 					old.call(this);
-					const self = this as PatchedSuggester<T>;
-					if (!self.popoverManager) self.popoverManager = new PopoverManager<T>(plugin, self, itemNormalizer);
-					self.popoverManager.load();
+					if (!this.popoverManager) this.popoverManager = new PopoverManager<T>(plugin, this, itemNormalizer);
+					this.popoverManager.load();
 				}
 			},
 			close(old) {
@@ -123,29 +124,5 @@ export default class QuickPreviewPlugin extends Plugin {
 		this.register(uninstaller);
 
 		return uninstaller;
-	}
-
-	patchCanvasSuggest() {
-		const plugin = this;
-
-		const uninstaller = around(SuggestModal.prototype, {
-			setInstructions(old) {
-				return function (...args: any[]) {
-					old.call(this, ...args);
-					const proto = Object.getPrototypeOf(this);
-					
-					if (this.hasOwnProperty('canvas') && proto.hasOwnProperty('showMarkdownAndCanvas') && proto.hasOwnProperty('showAttachments')) {
-						plugin.patchSuggester(this.constructor, (item: QuickSwitcherItem): PreviewInfo | null => {
-							if (!item.file) return null;
-							return { linktext: item.file.path, sourcePath: '' }
-						});
-
-						uninstaller();
-					}
-				}
-			}
-		});
-
-		this.register(uninstaller);
 	}
 }

@@ -23,8 +23,16 @@ export class PopoverManager<T> extends Component {
         else this.suggestions = suggest.chooser;
     }
 
+    get doc() {
+        return this.suggestions.containerEl.doc;
+    }
+
+    get win() {
+        return this.doc.win;
+    }
+
     onload() {
-        this.registerDomEvent(window, 'keydown', (event) => {
+        this.registerDomEvent(this.win, 'keydown', (event) => {
             if (this.suggest.isOpen && Keymap.isModifier(event, this.plugin.settings.modifier)) {
                 if (this.currentOpenHoverParent) this.hide();
                 else {
@@ -33,12 +41,12 @@ export class PopoverManager<T> extends Component {
                 }
             }
         });
-        this.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
+        this.registerDomEvent(this.win, 'keyup', (event: KeyboardEvent) => {
             if (event.key === this.plugin.settings.modifier) this.hide();
         });
         // This is a workaround for the problem that the keyup event is not fired when command key is released on macOS.
         // cf.) https://blog.bitsrc.io/keyup-event-and-cmd-problem-88f4038c5ed2
-        this.registerDomEvent(window, 'mousemove', (event: MouseEvent) => {
+        this.registerDomEvent(this.win, 'mousemove', (event: MouseEvent) => {
             if (!Keymap.isModifier(event, this.plugin.settings.modifier)) this.hide();
         });
 
@@ -75,12 +83,13 @@ export class PopoverManager<T> extends Component {
     spawnPreview(item: T, lazyHide: boolean = false, event: UserEvent | null = null) {
         this.hide(lazyHide);
 
-        if (event instanceof MouseEvent || event instanceof PointerEvent) this.lastEvent = event;
+        if (event && (event.instanceOf(MouseEvent) || event.instanceOf(PointerEvent))) this.lastEvent = event;
 
         this.currentHoverParent = new QuickPreviewHoverParent(this.suggest);
 
         const info = this.itemNormalizer(item);
-        if (info) this.plugin.onLinkHover(this.currentHoverParent, null, info.linktext, info.sourcePath, { scroll: info.line });
+        // From Obsidian v1.6, passing null as targetEl is no longer allowed.
+        if (info) this.plugin.onLinkHover(this.currentHoverParent, this.doc.body, info.linktext, info.sourcePath, { scroll: info.line });
     }
 
     getShownPos(): { x: number, y: number } {
@@ -100,11 +109,11 @@ export class PopoverManager<T> extends Component {
         if (position === 'Top left') {
             return { x: 0, y: 0 };
         } else if (position === 'Top right') {
-            return { x: window.innerWidth, y: 0 };
+            return { x: this.win.innerWidth, y: 0 };
         } else if (position === 'Bottom left') {
-            return { x: 0, y: window.innerHeight };
+            return { x: 0, y: this.win.innerHeight };
         }
-        return { x: window.innerWidth, y: window.innerHeight };
+        return { x: this.win.innerWidth, y: this.win.innerHeight };
     }
 
     getShownPosAuto(): { x: number, y: number } {
@@ -119,7 +128,7 @@ export class PopoverManager<T> extends Component {
             // show the popover next to the suggestion box if possible
             let offsetX = width * 0.1;
             let offsetY = height * 0.1;
-            if (right - offsetX + this.popoverWidth < window.innerWidth) return { x: right - offsetX, y: top + offsetY };
+            if (right - offsetX + this.popoverWidth < this.win.innerWidth) return { x: right - offsetX, y: top + offsetY };
             offsetX = width * 0.03;
             offsetY = height * 0.05;
             if (left > this.popoverWidth + offsetX) return { x: left - this.popoverWidth - offsetX, y: top + offsetY };
@@ -129,11 +138,11 @@ export class PopoverManager<T> extends Component {
         const x = (left + right) * 0.5;
         const y = (top + bottom) * 0.5;
 
-        if (x >= window.innerWidth * 0.6) { // not a typo. suggestion text tends to be on the left side. avoid covering it
-            if (y >= window.innerHeight * 0.5) return this.getShownPosCorner('Top left');
+        if (x >= this.win.innerWidth * 0.6) { // not a typo. suggestion text tends to be on the left side. avoid covering it
+            if (y >= this.win.innerHeight * 0.5) return this.getShownPosCorner('Top left');
             return this.getShownPosCorner('Bottom left');
         }
-        if (y >= window.innerHeight * 0.5) return this.getShownPosCorner('Top right');
+        if (y >= this.win.innerHeight * 0.5) return this.getShownPosCorner('Top right');
         return this.getShownPosCorner('Bottom right');
     }
 }
